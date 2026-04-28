@@ -1,0 +1,83 @@
+<svg width="1080" height="1920" viewBox="0 0 1080 1920" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1920" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E0F7FA"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(250 300) rotate(90) scale(600 600)">
+      <stop stop-color="white" stop-opacity="0.75"/>
+      <stop offset="1" stop-color="white" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bottleGrad" x1="594" y1="500" x2="964" y2="1490" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F9FDFF" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#DBEDF2" stop-opacity="0.52"/>
+    </linearGradient>
+    <filter id="frostBlur" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#8BA8B2" flood-opacity="0.25"/>
+    </filter>
+    <linearGradient id="cta" x1="80" y1="1730" x2="1000" y2="1835" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8C3A"/>
+      <stop offset="1" stop-color="#FF6A3C"/>
+    </linearGradient>
+    <style>
+      .jp-bold { font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; font-weight: 700; }
+      .jp-reg { font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif; font-weight: 400; }
+      .en-bold { font-family: "Montserrat", "Arial", sans-serif; font-weight: 700; letter-spacing: 0.08em; }
+    </style>
+  </defs>
+
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <rect width="1080" height="1920" fill="url(#glow)"/>
+
+  <!-- Left sherbet texture macro -->
+  <g opacity="0.9" filter="url(#frostBlur)">
+    <path d="M80 740C120 680 178 620 230 646C282 672 300 744 262 802C226 860 184 960 126 938C68 916 40 804 80 740Z" fill="#F3FDFF"/>
+    <path d="M138 890C190 838 288 850 336 918C384 986 356 1080 296 1120C236 1160 130 1132 82 1068C34 1004 86 942 138 890Z" fill="#EAF9FD"/>
+    <path d="M100 1100C162 1048 260 1068 304 1140C348 1212 326 1308 256 1362C186 1416 70 1398 36 1328C2 1258 38 1152 100 1100Z" fill="#F6FCFF"/>
+  </g>
+  <g fill="white" fill-opacity="0.75">
+    <circle cx="112" cy="826" r="8"/><circle cx="188" cy="968" r="10"/><circle cx="238" cy="1038" r="12"/>
+    <circle cx="150" cy="1164" r="14"/><circle cx="264" cy="1248" r="9"/><circle cx="82" cy="1326" r="11"/>
+  </g>
+
+  <!-- Bottle -->
+  <g filter="url(#softShadow)">
+    <rect x="658" y="430" width="226" height="124" rx="22" fill="#EAF5F9" fill-opacity="0.8" stroke="white" stroke-opacity="0.88" stroke-width="2"/>
+    <rect x="612" y="540" width="318" height="928" rx="52" fill="url(#bottleGrad)" stroke="white" stroke-opacity="0.85" stroke-width="3"/>
+    <rect x="642" y="600" width="12" height="808" rx="6" fill="white" fill-opacity="0.24"/>
+    <rect x="692" y="600" width="10" height="808" rx="5" fill="white" fill-opacity="0.17"/>
+    <rect x="742" y="600" width="10" height="808" rx="5" fill="white" fill-opacity="0.14"/>
+  </g>
+
+  <!-- Text -->
+  <text x="70" y="170" class="jp-bold" font-size="64" fill="white">夏、肌の上の雪どけ。</text>
+  <text x="70" y="252" class="jp-bold" font-size="64" fill="white">35℃でも、涼しげな私のまま。</text>
+
+  <text x="660" y="840" class="en-bold" font-size="48" fill="#9CB3BC">SNOW</text>
+  <text x="660" y="898" class="en-bold" font-size="48" fill="#9CB3BC">MELTY</text>
+  <text x="660" y="956" class="en-bold" font-size="48" fill="#9CB3BC">BASE</text>
+
+  <text x="460" y="1008" class="jp-reg" font-size="34" fill="#F3FBFF">SPF50+ / PA++++</text>
+  <text x="460" y="1058" class="jp-reg" font-size="34" fill="#F3FBFF">CICA×スノーハーブ配合</text>
+
+  <text x="60" y="1506" class="jp-bold" font-size="43" fill="white">【期間限定】Z世代応援キャンペーン</text>
+
+  <text x="80" y="1588" class="jp-reg" font-size="52" fill="#707D86">通常3,400円</text>
+  <line x1="80" y1="1562" x2="350" y2="1562" stroke="#6C747A" stroke-width="5" stroke-linecap="round"/>
+  <text x="370" y="1588" class="jp-reg" font-size="48" fill="#4E6A8B">→ 初回20%OFF</text>
+  <text x="80" y="1672" class="jp-bold" font-size="82" fill="#FF5A2E">2,720円（税込）</text>
+
+  <rect x="80" y="1724" width="920" height="116" rx="58" fill="url(#cta)"/>
+  <text x="540" y="1799" class="jp-bold" font-size="52" text-anchor="middle" fill="white">雪どけ肌を体験する</text>
+  <text x="540" y="1868" class="jp-reg" font-size="24" text-anchor="middle" fill="#6F808A">※メイクアップ効果による</text>
+
+  <!-- silver micro sheen -->
+  <g fill="#F4FAFC" fill-opacity="0.24">
+    <circle cx="964" cy="210" r="2"/><circle cx="934" cy="278" r="1.8"/><circle cx="1004" cy="326" r="2"/>
+    <circle cx="906" cy="392" r="1.6"/><circle cx="988" cy="460" r="1.7"/><circle cx="1018" cy="520" r="1.6"/>
+    <circle cx="950" cy="608" r="1.8"/><circle cx="1010" cy="686" r="1.9"/><circle cx="910" cy="752" r="1.8"/>
+  </g>
+</svg>
