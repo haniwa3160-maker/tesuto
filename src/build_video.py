@@ -19,18 +19,33 @@ OUT = os.path.join(ROOT, "out")
 CHROME = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
 FFMPEG = imageio_ffmpeg.get_ffmpeg_exe()
 
-# Shorts：本編のどこを 60 秒に切り出すか（開始秒, 終了秒）
+# Shorts（R6③）：時系列に並べず、結論を先に見せてから「なぜ」を語る。
+# 秒数直打ちだと台本を直すたびに壊れるので、シーン内の割合で指定する。
+# (シーンID, 開始割合, 終了割合, 最大秒数)
 SHORTS_CUTS = [
-    ("s2",  17.8,  24.6),   # ゴミ置き場でシロを見つける
-    ("s3",  47.0,  54.5),   # 目が光る／シロと名づける
-    ("s4",  54.5,  62.0),   # ここほれワンワン
-    ("s4",  70.0,  76.0),   # かんかんと たね
-    ("s5", 100.0, 106.0),   # ケンタが借りる
-    ("s6", 126.0, 136.8),   # こわれる
-    ("s8", 163.0, 176.0),   # おなかは土と たね
-    ("s9", 196.0, 204.9),   # 一面の花
-    ("end", 240.0, 249.0),  # 結び＋タイトル
+    ("s9",  0.72, 1.00, 7.0),   # 結論：灰色の中庭が花でいっぱいになる
+    ("op",  0.00, 0.30, 4.0),   # 問い：この犬はごみ捨て場に捨てられていた
+    ("s2",  0.45, 0.85, 6.0),   # 拾う
+    ("s3",  0.46, 0.74, 5.0),   # 目が光る
+    ("s4",  0.00, 0.34, 6.0),   # ここほれ、ワン！
+    ("s4b", 0.34, 0.62, 5.0),   # ハナの種は芽が出ない
+    ("s6",  0.42, 0.80, 6.5),   # こわれる
+    ("s8",  0.34, 0.68, 7.0),   # おなかは土と種
+    ("s9",  0.24, 0.66, 6.0),   # 芽が出る
+    ("end", 0.00, 0.48, 7.5),   # 結び
 ]
+
+
+def resolve_cuts(tl):
+    """割合指定の SHORTS_CUTS を、実時間の (開始秒, 終了秒) に変換する。"""
+    out = []
+    for scene, a, b, cap in SHORTS_CUTS:
+        s = tl["scenes"][scene]
+        dur = s["end"] - s["start"]
+        t0 = s["start"] + dur * a
+        t1 = min(s["start"] + dur * b, t0 + cap)
+        out.append((t0, t1))
+    return out
 
 
 def launch(pw, tl, w, h):
@@ -70,13 +85,14 @@ def main():
 
     if args.shorts:
         w, h, out = 1080, 1920, os.path.join(OUT, "kokohore_shiro_shorts.mp4")
+        cuts = resolve_cuts(tl)
         times = []
-        for _, a, b in SHORTS_CUTS:
+        for a, b in cuts:
             n = int((b - a) * fps)
             times += [a + i / fps for i in range(n)]
         # 音は本編から同じ区間を切り出して連結する
         seg_files = []
-        for i, (_, a, b) in enumerate(SHORTS_CUTS):
+        for i, (a, b) in enumerate(cuts):
             f = os.path.join(BUILD, f"sa{i}.wav")
             subprocess.run([FFMPEG, "-y", "-hide_banner", "-loglevel", "error",
                             "-i", audio, "-ss", str(a), "-to", str(b), f], check=True)

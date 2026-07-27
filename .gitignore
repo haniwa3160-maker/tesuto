@@ -4,3 +4,5 @@ build/*.wav
 build/sa*.wav
 build/salist.txt
 __pycache__/
+build/sheet*.png
+out/*.mp4

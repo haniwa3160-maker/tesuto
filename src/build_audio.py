@@ -9,9 +9,10 @@ import sys
 import numpy as np
 import pyopenjtalk
 from scipy.io import wavfile
+from scipy.signal import lfilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from story import BEATS, VOICES, SCENE_ORDER  # noqa: E402
+from story import BEATS, VOICES, SCENE_ORDER, MIN_SUB  # noqa: E402
 
 SR = 48000
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -77,13 +78,9 @@ def note_pad(f, dur, vel):
         y += np.sin(2 * np.pi * f * (1 + det) * t)
     y += 0.25 * np.sin(2 * np.pi * f * 2 * t)
     y /= 3.5
-    # 一次ローパス
+    # 一次ローパス（サンプルごとの Python ループは遅いので lfilter で）
     a = 0.10
-    out = np.zeros(n)
-    acc = 0.0
-    for i in range(0, n, 1):
-        acc += a * (y[i] - acc)
-        out[i] = acc
+    out = lfilter([a], [1.0, -(1.0 - a)], y)
     out *= adsr(n, 0.45, 0.3, 0.75, dur * 0.5)
     return out * vel
 
@@ -191,6 +188,12 @@ SE = {"boot": se_boot, "dig": se_dig, "crash": se_crash,
 # ---------------------------------------------------------------- BGM
 # シーンごとの気分。(コード進行, 主旋律の音階, 楽器, 音量, 1小節の秒数)
 MOODS = {
+    "op":  dict(chords=[("C4", "maj"), ("G3", "maj"), ("A3", "min"), ("F3", "maj")],
+                mel=["G5", "C6", "B5", "A5", "G5", "E5", "G5", None],
+                vol=0.24, bar=2.6, lead="pluck"),
+    "s4b": dict(chords=[("A3", "min"), ("F3", "maj"), ("C4", "maj"), ("G3", "maj")],
+                mel=["E5", None, "D5", None, "C5", None, "D5", None],
+                vol=0.16, bar=4.2, lead="box"),
     "s1":  dict(chords=[("A3", "min"), ("F3", "maj"), ("C4", "maj"), ("G3", "maj")],
                 mel=["A4", None, "C5", None, "B4", None, "A4", None],
                 vol=0.16, bar=4.0, lead="box"),
@@ -276,11 +279,15 @@ def main():
             x = synth_line(b)
             dur = len(x) / SR
             narration.append((int(cursor * SR), x))
+            pad = b["pad"]
+            # 短いセリフでも字幕が読めるだけの時間を確保する
+            if dur + pad + 0.45 < MIN_SUB:
+                pad = MIN_SUB - dur - 0.45
             events.append({"kind": "line", "scene": sc, "speaker": b["speaker"],
                            "start": round(cursor, 3),
-                           "end": round(cursor + dur, 3),
+                           "end": round(cursor + dur + pad - 0.45, 3),
                            "sub": b["sub"]})
-            cursor += dur + b["pad"]
+            cursor += dur + pad
         else:
             events.append({"kind": "hold", "scene": sc,
                            "start": round(cursor, 3),
@@ -318,7 +325,8 @@ def main():
     hush_s, hush_e = int(crash_ev["start"] * SR), int((crash_ev["end"] + 6.0) * SR)
     ramp = np.ones(n_total)
     ramp[hush_s:hush_e] = 0.0
-    g = int(0.6 * SR)
+    # 衝撃の 1.2 秒前から音を絞る＝「何か来る」と予告して、驚きではなく悲しみにする
+    g = int(1.2 * SR)
     ramp[max(0, hush_s - g):hush_s] = np.linspace(1, 0, min(g, hush_s))
     ramp[hush_e:hush_e + int(2.5 * SR)] = np.linspace(0, 1, int(2.5 * SR))[:max(0, n_total - hush_e)]
     bgm *= ramp
@@ -335,21 +343,36 @@ def main():
     se_track = np.zeros(n_total)
 
     def place(name, at, gain=1.0):
+        if at is None:
+            return
         y = SE[name]() * gain
         s = int(at * SR)
         se_track[s:s + len(y)] += y[:max(0, n_total - s)]
 
-    def ev(scene, needle):
-        return next(e for e in events
-                    if e["scene"] == scene and e["sub"] and needle in e["sub"])
+    def at(e, off=0.0):
+        return None if e is None else e["end"] + off
 
-    place("boot", ev("s3", "あさ。ピピッ")["start"] + 0.35, 1.0)
-    place("dig", ev("s4", "いきなり ほりはじめ")["end"] + 0.15, 0.9)
-    place("sparkle", ev("s4", "小さな たねが")["end"] - 0.4, 0.8)
-    place("dig", ev("s6", "あきかんと")["end"] + 0.1, 0.7)
-    place("crash", crash_ev["start"] - 0.05, 1.0)
-    place("bloom", ev("s9", "つぼみから")["end"] - 0.2, 1.0)
-    place("sparkle", ev("s9", "花で いっぱいに")["start"], 0.6)
+    def at_start(e, off=0.0):
+        return None if e is None else e["start"] + off
+
+    def ev(scene, needle):
+        """台本を書き換えても壊れないよう、見つからなければ None を返す。"""
+        for e in events:
+            if e["scene"] == scene and e["sub"] and needle in e["sub"]:
+                return e
+        print(f"  [注意] 効果音の位置が見つからない: {scene} / {needle}")
+        return None
+
+    place("dig", at(ev("op", "ここほれ"), 0.05), 1.0)
+    place("boot", at_start(ev("s3", "ピピッ"), 0.35), 1.0)
+    for e in events:                      # S4 の三度の「ここほれ」に土の音を当てる
+        if e["scene"] == "s4" and e["sub"] and "ここほれ" in e["sub"]:
+            place("dig", e["end"] + 0.05, 0.85)
+    place("sparkle", at(ev("s4", "たねが ひとつぶ"), -0.4), 0.8)
+    place("dig", at(ev("s6", "ゴミ ばかり"), 0.1), 0.7)
+    place("crash", crash_ev["start"] - 0.05, 0.80)
+    place("bloom", at(ev("s9", "つぼみから"), -0.2), 1.0)
+    place("sparkle", at_start(ev("s9", "ハナが うえた"), 0.2), 0.7)
 
     mix = voice * 1.0 + bgm + se_track * 0.75
     peak = np.max(np.abs(mix))

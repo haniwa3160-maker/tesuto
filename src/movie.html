@@ -5,10 +5,10 @@
   #stage { position:relative; width:1920px; height:1080px; overflow:hidden;
            font-family:"Rounded Mplus 1c","M PLUS Rounded 1c",sans-serif; }
   #art { position:absolute; inset:0; width:100%; height:100%; display:block; }
-  #scrim { position:absolute; left:0; right:0; bottom:0; height:300px; pointer-events:none;
+  #scrim { position:absolute; left:0; right:0; bottom:0; height:380px; pointer-events:none;
            background:linear-gradient(to bottom, rgba(28,24,54,0) 0%, rgba(28,24,54,.42) 55%, rgba(28,24,54,.62) 100%); }
-  #sub { position:absolute; left:0; right:0; bottom:46px; text-align:center;
-         font-weight:800; font-size:52px; line-height:1.32; color:#fff;
+  #sub { position:absolute; left:0; right:0; bottom:124px; text-align:center;
+         font-weight:800; font-size:48px; line-height:1.30; color:#fff;
          white-space:pre-line; padding:0 150px;
          text-shadow: 0 0 14px rgba(21,18,40,.95),
                       4px 4px 0 #2b2545, -4px 4px 0 #2b2545,
@@ -102,7 +102,7 @@ function hana(t,{x=0,y=BASE,s=CS,emote='neutral',arm='down',flip=false,walk=0}={
       path(`M -22 ${132+legSw} h -8`,'none',INK,20)+
       path(`M  22 ${132-legSw} h  8`,'none',INK,20)+
       path(armD,'none',C.hoodie,24);
-  return g(g(body+head,'translate(0,-132)'),
+  return g(shadow(0,2,62)+g(body+head,'translate(0,-132)'),
            `translate(${x},${y}) scale(${flip?-s:s},${s})`);
 }
 
@@ -138,7 +138,8 @@ function shiro(t,{x=0,y=BASE,s=CS,on=true,flip=false,dig=0,lie=false,glow=1}={})
       `translate(56,${-52+b}) rotate(${lie?14:0})`);
   const collar = rect(-6,-22,32,58,C.collar,11,INK,6);
   const inner  = g(collar+body+head, `translate(0,${b}) rotate(${digA*0.5},0,20)`);
-  return g(g(inner,`translate(0,${lie?-42:-64})`), `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+  return g(shadow(6,2,lie?86:70)+g(inner,`translate(0,${lie?-42:-64})`),
+           `translate(${x},${y}) scale(${flip?-s:s},${s})`);
 }
 
 function kenta(t,{x=0,y=BASE,s=CS,emote='neutral',phone=false,flip=false}={}){
@@ -175,7 +176,8 @@ function kenta(t,{x=0,y=BASE,s=CS,emote='neutral',phone=false,flip=false}={}){
       path('M  20 84 v 46','none',C.kentaPant,26)+
       path('M -20 130 h -8','none',INK,20)+path('M 20 130 h 8','none',INK,20)+
       arms+ph;
-  return g(g(body+head,'translate(0,-130)'), `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+  return g(shadow(0,2,60)+g(body+head,'translate(0,-130)'),
+           `translate(${x},${y}) scale(${flip?-s:s},${s})`);
 }
 
 function baa(t,{x=0,y=BASE,s=CS*0.92,flip=false,emote='happy'}={}){
@@ -196,7 +198,8 @@ function baa(t,{x=0,y=BASE,s=CS*0.92,flip=false,emote='happy'}={}){
       path('M -42 -6 q -20 44 -12 62 M 42 -6 q 20 44 12 62','none',C.baaCloth,22)+
       path('M -18 80 v 42','none','#7a6f8a',24)+path('M 18 80 v 42','none','#7a6f8a',24)+
       path('M -18 122 h -8','none',INK,18)+path('M 18 122 h 8','none',INK,18);
-  return g(g(body+head,'translate(0,-122)'), `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+  return g(shadow(0,2,56)+g(body+head,'translate(0,-122)'),
+           `translate(${x},${y}) scale(${flip?-s:s},${s})`);
 }
 
 function crowd(t,seed,n,x0,x1,y,s){
@@ -205,7 +208,7 @@ function crowd(t,seed,n,x0,x1,y,s){
   for(let i=0;i<n;i++){
     const x=lerp(x0,x1,r()), sc=s*(0.85+r()*0.3), c=cols[Math.floor(r()*cols.length)];
     const bb=Math.sin(t*(1.6+r()*1.4)+i)*5;
-    o+=g(circ(0,-76,26,C.skin,INK,5)+
+    o+=g(shadow(0,52,42,0.13)+circ(0,-76,26,C.skin,INK,5)+
          path('M -32 -52 q -6 54 -2 76 q 34 8 68 0 q 4 -22 -2 -76 z',c,INK,5)+
          path('M -13 24 v 26 M 13 24 v 26','none','#4c5570',14),
          `translate(${x},${y+bb}) scale(${sc})`);
@@ -223,7 +226,7 @@ function cloud(x,y,s,c='#fff'){
   return g(ell(0,0,92,52,c)+ell(-72,16,58,38,c)+ell(74,18,52,34,c),`translate(${x},${y}) scale(${s})`);
 }
 // 団地（背景なので小さめ・軽め）
-function danchi(seed,{lit=0.3,warm=false,open=0}={}){
+function danchi(seed,{lit=0.3,warm=false,open=0,green=false}={}){
   const specs=[[70,300,300,260],[400,240,340,320],[790,270,300,290],[1130,225,350,335],[1520,290,330,270]];
   let o='';
   specs.forEach((sp,k)=>{
@@ -238,11 +241,39 @@ function danchi(seed,{lit=0.3,warm=false,open=0}={}){
       if(r()<open) o+=rect(wx,wy,ww/2,wh,'#5d6478',3,INK,2.5);
     }
   });
+  return o + hedge(seed,{green});
+}
+// 建物の足元の植え込み。中景が空くのを埋める
+function hedge(seed,{green=false}={}){
+  const r=R('hedge'+seed); let o='';
+  const spans=[[40,340],[420,760],[820,1120],[1180,1520],[1580,1880]];
+  for(const [x0,x1] of spans){
+    const y=HZ+4, h=42;
+    o+=rect(x0,y-h,x1-x0,h+10, green?'#6ea55f':'#8f9aa0', 16, INK, 5);
+    for(let x=x0+26;x<x1-16;x+=44)
+      o+=ell(x,y-h+6+r()*8, 24, 18, green?'#7db06c':'#9aa5aa');
+  }
   return o;
 }
-function ground(col=C.concrete,edge='#9aa0ab'){
-  return rect(0,HZ,W,H-HZ,col)+path(`M 0 ${HZ} H ${W}`,'none',edge,6)+rect(0,HZ+6,W,10,'#c8ccd4');
+function ground(col=C.concrete,edge='#9aa0ab',joints=true){
+  let joint='';
+  if(joints){
+    // 舗装の目地。奥ほど詰まって見えるように、手前ほど間隔を広げる
+    let y=HZ+44, step=24;
+    while(y<H+80){ joint+=path(`M 0 ${y} H ${W}`,'none',edge,3.2); y+=step; step*=1.32; }
+    for(let i=-6;i<=6;i++){
+      joint+=path(`M ${W/2+i*88} ${HZ+38} L ${W/2+i*440} ${H+90}`,'none',edge,3.2);
+    }
+    joint=`<g opacity="0.55">${joint}</g>`;
+  }
+  return rect(0,HZ,W,H-HZ,col)+joint+
+         path(`M 0 ${HZ} H ${W}`,'none',edge,6)+rect(0,HZ+6,W,10,'#c8ccd4');
 }
+// 足元の影。これが無いとキャラが地面から浮いて見える
+function shadow(x,y,rx=64,op=0.15){
+  return `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${rx*0.24}" fill="#2b2545" opacity="${op}"/>`;
+}
+
 function flower(x,y,s,col,t,ph=0){
   const sw=Math.sin(t*1.6+ph)*5; let p='';
   for(let i=0;i<5;i++){const a=i*72+sw*2;
@@ -321,6 +352,72 @@ function desk(){
 // ===================================================================== シーン
 const SCENES = {};
 
+// ---- op コールドオープン
+SCENES.op = (u,t)=>{
+  if(u<0.66){ const p=seg(u,0,0.66);
+    return sky('#9fd8f0','#e2f3fb')+cloud(380,170,1.0)+cloud(1520,130,0.85)+
+      danchi('b',{lit:0.2})+ground(C.concrete)+
+      cam(crack(700,880,1.3,'q1')+
+          shiro(t,{x:900,y:BASE+30,s:2.3,on:true,dig:1})+ dust(t,880,880,14,'opd')+
+          `<g opacity="${0.5+0.4*Math.sin(t*6)}">`+circ(1240,420,14,C.yellow)+
+            circ(560,380,12,C.yellow)+`</g>`,
+          {z:1.10-p*0.10,zx:940,zy:760});
+  }
+  const p=seg(u,0.66,1), pop=smooth(clamp(p*3));
+  const r=R('bloom'); let fl='';
+  for(let i=0;i<70;i++){const x=r()*W, y=HZ+70+r()*380;
+    fl+=flower(x,y,0.55+r()*0.7,[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
+  return sky('#8fd0ee','#f6fdff')+cloud(360,150,1.1)+cloud(1520,190,0.9)+
+    danchi('c',{lit:0.5,warm:true})+ground('#8fc27f','#6ea55f')+fl+
+    `<g opacity="0.62">`+rect(0,0,W,H,'#2b2545')+`</g>`+
+    g(txt(0,0,'ここほれ、シロ！',168,'#fff')+
+      txt(0,112,'〜 はなさかじいさん 2026 〜',58,'#ffe6a8'),
+      `translate(960,470) scale(${lerp(0.7,1,pop)})`);
+};
+
+// ---- S4b ハナが植える／芽は出ない／夜のシロ
+SCENES.s4b = (u,t)=>{
+  const base = sky('#a9c9dd','#e6eef4')+danchi('b',{lit:0.18})+ground(C.concrete);
+  const pot = (x,y,s,sprouted)=>g(
+      path('M -54 -34 l 12 74 q 42 12 84 0 l 12 -74 z',C.soil,INK,7)+
+      ell(0,-34,54,16,C.soil2,INK,6)+
+      (sprouted? sprout(0,-38,1.5,1,t) : ''),
+      `translate(${x},${y}) scale(${s})`);
+  if(u<0.34){ const p=seg(u,0,0.34);
+    return base + cam(pot(1180,880,1.6,false)+
+          g(hana(t,{x:0,y:0,s:1.6,emote:'neutral',arm:'hold'}),'translate(760,900)')+
+          // じょうろ
+          g(rect(-40,-30,80,62,'#7fd1c9',12,INK,6)+path('M 40 -14 q 46 -8 60 24','none','#7fd1c9',10)+
+            path('M 100 16 q 8 44 -4 78','none','#8fd3ef',9),'translate(950,760)'),
+          {z:1.04+p*0.10,zx:1000,zy:760});
+  }
+  if(u<0.62){ const p=seg(u,0.34,0.62);
+    return sky('#bcc6d2','#e2e8ee')+danchi('b',{lit:0.14})+ground('#b2b7c1')+
+      cam(pot(960,900,2.6,false)+
+          `<g opacity="${0.3+0.2*Math.sin(t*2)}">`+dust(t,960,880,5,'s4bd','#c8ccd4')+`</g>`+
+          hana(t,{x:480,y:BASE+40,s:1.4,emote:'sad'}),
+          {z:1.06+p*0.08,zx:960,zy:780});
+  }
+  if(u<0.78){ const p=seg(u,0.62,0.78);
+    return base + cam(pot(1220,880,1.5,false)+
+          hana(t,{x:700,y:BASE,s:1.5,emote:'sad'})+
+          baa(t,{x:1000,y:BASE,s:1.35}),
+          {z:1.02+p*0.08,zy:760});
+  }
+  // 夜：中庭でひとり、何かしているシロ（意味はまだ分からない）
+  const p=seg(u,0.78,1);
+  return sky('#232a52','#4a5480')+
+    cam(danchi('b',{lit:0.22,warm:true})+ground('#3f465e','#2c3244')+
+        circ(1620,190,58,'#fff4c2')+circ(1350,240,5,'#fff')+circ(420,200,4,'#fff')+
+        shiro(t,{x:lerp(700,1080,smooth(p)),y:BASE+40,s:1.6,on:true,dig:1,glow:0.8})+
+        // 窓から見ているハナのシルエット
+        g(rect(-90,-120,180,240,'#ffd98a',12,INK,6)+
+          `<g opacity="0.85">`+circ(0,-40,42,'#5a4a3a')+
+          path('M -56 20 q -6 -60 56 -60 q 62 0 56 60 z','#5a4a3a')+`</g>`,
+          'translate(300,330)'),
+        {z:1.04+p*0.06,zy:760});
+};
+
 // ---- S1 ひとりのハナ
 SCENES.s1 = (u,t)=>{
   if(u<0.30){ const p=seg(u,0,0.30);
@@ -347,6 +444,10 @@ SCENES.s1 = (u,t)=>{
         crack(1560,880,1.0,'q4')+
         g(rect(0,0,300,34,'#9b8f7d',10,INK,6)+rect(26,34,24,74,'#7d7365',8,INK,5)+
           rect(250,34,24,74,'#7d7365',8,INK,5),'translate(1380,690)')+
+        // ベンチに、ひとりだけ座っている後ろ姿（＝さくらばあちゃん）
+        g(circ(0,-96,40,C.baaHair,INK,6)+
+          path('M -40 -60 q -10 56 -4 84 q 44 10 88 0 q 6 -28 -4 -84 z',C.baaCloth,INK,6),
+          'translate(1500,700)')+
         // 風に転がる空きペットボトルだけが動いている
         g(rect(0,-22,86,44,'#cfe6f5',20,INK,6)+rect(78,-12,20,24,'#8fd3ef',8,INK,5),
           `translate(${(260+t*70)%1700},${900+Math.sin(t*4)*6}) rotate(${t*90%360})`)+
@@ -420,28 +521,34 @@ SCENES.s3 = (u,t)=>{
         {z:1.0+p*0.06,zy:700});
 };
 
-// ---- S4 ここほれ、ワン！
+// ---- S4 ここほれ、ワン！（三度の反復）
 SCENES.s4 = (u,t)=>{
   const base = sky('#9fd8f0','#e2f3fb')+cloud(380,170,1.0)+cloud(1520,130,0.85)+
       danchi('b',{lit:0.2})+ground(C.concrete);
-  if(u<0.28){ const p=seg(u,0,0.28);
-    return base+ cam(crack(720,880,1.2,'q1')+
-          shiro(t,{x:880,y:BASE,s:1.55,on:true,dig:1})+ dust(t,860,860,10,'s4d')+
-          hana(t,{x:1420,y:BASE,s:CS,emote:'wow'}),
-          {z:1.02+p*0.12,zx:960,zy:720});
+  if(u<0.34){ const p=seg(u,0,0.34);
+    // 掘るたびに、がっかりする出土物が増えていく
+    let finds='';
+    if(p>0.34) finds+=g(rect(0,0,52,74,'#c0c6d0',12,INK,6)+rect(8,8,36,20,'#9aa2b0',6),
+                        'translate(1180,830) rotate(-12)');
+    if(p>0.68) finds+=path('M 1310 900 q 30 -46 62 -10 q -22 26 -62 10','#c9ced8',INK,6)+
+                      path('M 1352 884 q 46 22 66 46','none','#c9ced8',12);
+    return base+ cam(crack(700,880,1.3,'q1')+ finds+
+          shiro(t,{x:880,y:BASE+20,s:1.75,on:true,dig:1})+ dust(t,860,880,12,'s4d')+
+          hana(t,{x:1560,y:BASE,s:CS,emote:'wow'}),
+          {z:1.04+p*0.10,zx:960,zy:760});
   }
-  if(u<0.54){ const p=seg(u,0.28,0.54);
-    const rise=smooth(p)*110;
-    return base+ cam(rect(660,830,360,200,C.soil,24,INK,7)+ell(840,838,178,44,C.soil2)+
+  if(u<0.52){ const p=seg(u,0.34,0.52);
+    const rise=smooth(p)*120;
+    return base+ cam(rect(640,830,380,210,C.soil,24,INK,7)+ell(830,838,188,46,C.soil2)+
           g(rect(-142,-110,284,220,'#9ec4b8',20,INK,8)+rect(-142,-110,284,38,'#7fae9f',11,INK,6)+
             path('M -96 -28 h 192 M -96 24 h 144','none','#5f8b7e',9),
-            `translate(840,${880-rise}) rotate(${-8+Math.sin(t*2)*3})`)+
-          dust(t,840,880,6,'s4e')+
-          shiro(t,{x:1240,y:BASE,s:1.35,on:true})+
-          hana(t,{x:420,y:BASE,s:CS,emote:'wow'}),
-          {z:1.08+p*0.08,zx:900,zy:740});
+            `translate(830,${880-rise}) rotate(${-8+Math.sin(t*2)*3})`)+
+          dust(t,830,880,6,'s4e')+
+          shiro(t,{x:1300,y:BASE,s:1.4,on:true})+
+          hana(t,{x:400,y:BASE,s:CS,emote:'wow'}),
+          {z:1.06+p*0.08,zx:900,zy:760});
   }
-  if(u<0.80){ const p=seg(u,0.54,0.80);
+  if(u<0.76){ const p=seg(u,0.52,0.76);
     return sky('#ffe9c9','#fff7ea')+
       cam(rect(0,0,W,H,'#fff3dc')+
           g(rect(-500,-330,1000,660,'#9ec4b8',34,INK,10)+
@@ -459,8 +566,8 @@ SCENES.s4 = (u,t)=>{
             'translate(960,540)'),
           {z:1.0+p*0.10});
   }
-  const p=seg(u,0.80,1);
-  return base+ cam(rect(660,830,360,200,C.soil,24,INK,7)+
+  const p=seg(u,0.76,1);
+  return base+ cam(rect(640,830,380,210,C.soil,24,INK,7)+
         hana(t,{x:700,y:BASE,s:CS,emote:'happy'})+
         shiro(t,{x:1010,y:BASE,s:1.2,on:true})+
         baa(t,{x:1400,y:BASE,s:1.4})+
@@ -608,7 +715,7 @@ SCENES.s9 = (u,t)=>{
     for(let i=0;i<11;i++){const x=140+i*168, d=clamp(p*1.7-(i%5)*0.09);
       sp+=sprout(x,830+((i%3)*66),2.6,d,t);}
     return sky('#a9d8ee','#ecf7fd')+cloud(400,170,0.9)+
-      cam(danchi('c',{lit:0.34,warm:true})+ground(C.concrete)+
+      cam(danchi('c',{lit:0.34,warm:true,green:true})+ground(C.concrete)+
           crack(700,880,1.4,'q1')+crack(1220,910,1.2,'q2')+sp,
           {z:1.02+p*0.08,zy:800});
   }
@@ -618,7 +725,7 @@ SCENES.s9 = (u,t)=>{
       fl += d<0.7 ? sprout(x,840+((i%3)*60),2.6,1,t)
                   : flower(x,760+((i%3)*66),1.0+d*0.9,[C.pink,C.yellow,C.red,C.purple][i%4],t,i);}
     return sky('#9fd6ef','#f2fbff')+cloud(380,160,1.0)+cloud(1510,200,0.8)+
-      cam(danchi('c',{lit:0.36,warm:true})+ground(C.concrete)+fl,
+      cam(danchi('c',{lit:0.36,warm:true,green:true})+ground(C.concrete)+fl,
           {z:1.04+p*0.06,zy:800});
   }
   const p=seg(u,0.66,1);
@@ -626,8 +733,12 @@ SCENES.s9 = (u,t)=>{
   for(let i=0;i<80;i++){const x=r()*W, y=HZ+70+r()*380;
     fl+=flower(x,y,(0.55+r()*0.7)*(0.55+0.55*smooth(p)),[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
   return sky('#8fd0ee','#f6fdff')+cloud(340,150,1.1)+cloud(1530,190,0.9)+
-    cam(danchi('c',{lit:0.5,warm:true,open:0.35})+ground('#8fc27f','#6ea55f')+fl+
+    cam(danchi('c',{lit:0.5,warm:true,open:0.35,green:true})+ground('#8fc27f','#6ea55f')+fl+
         crowd(t,'s9',9,180,1780,800,0.95)+
+        // ハナが植えたひとつぶ：中央で、ひときわ大きく
+        g(flower(0,0,2.3,'#fff',t,0)+
+          `<g opacity="${0.30+0.22*Math.sin(t*2.4)}">`+circ(0,0,110,C.yellow)+`</g>`,
+          'translate(1450,800)')+
         hana(t,{x:820,y:BASE,s:1.55,emote:'happy',arm:'up'})+
         baa(t,{x:1180,y:BASE,s:1.35})+
         petals(t,26,'s9p'),
@@ -646,7 +757,7 @@ SCENES.s10 = (u,t)=>{
   for(let i=0;i<80;i++){const x=r()*W, y=HZ+70+r()*380;
     fl+=flower(x,y,0.55+r()*0.7,[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
   const base = sky('#8fd0ee','#f6fdff')+cloud(380,150,1.0)+cloud(1490,190,0.85)+
-      danchi('c',{lit:0.5,warm:true,open:0.3})+ground('#8fc27f','#6ea55f');
+      danchi('c',{lit:0.5,warm:true,open:0.3,green:true})+ground('#8fc27f','#6ea55f');
   const can=(x,y,s,pour)=>g(
       rect(-56,-44,112,88,'#7fd1c9',16,INK,6)+rect(-18,-64,36,22,'#7fd1c9',7,INK,5)+
       path('M 56 -22 q 66 -12 86 34','none','#7fd1c9',13)+
@@ -657,13 +768,25 @@ SCENES.s10 = (u,t)=>{
           kenta(t,{x:1480,y:BASE,s:1.6,emote:'sorry',flip:true})+ petals(t,18,'s10p'),
           {z:1.02+p*0.08,zx:1100,zy:720});
   }
-  if(u<0.70){ const p=seg(u,0.42,0.70);
+  if(u<0.62){ const p=seg(u,0.42,0.62);
     return base+ cam(fl+ hana(t,{x:780,y:BASE,s:1.6,emote:'happy',arm:'hold'})+
           can(lerp(940,1230,smooth(p)),lerp(700,730,smooth(p)),1.0,false)+
           kenta(t,{x:1440,y:BASE,s:1.6,emote:'sorry',flip:true})+ petals(t,18,'s10q'),
           {z:1.06+p*0.03,zx:1100,zy:720});
   }
-  const p=seg(u,0.70,1);
+  if(u<0.78){ const p=seg(u,0.62,0.78);
+    // 「つぎの日も、そのつぎの日も」：空の色だけを変えて日をまたぐ
+    const day=Math.floor(p*3);
+    const skies=[['#8fd0ee','#f6fdff'],['#ffd9a0','#fff3d8'],['#9fd6ef','#f2fbff']];
+    return sky(skies[day][0],skies[day][1])+cloud(380+day*160,150,1.0)+
+      danchi('c',{lit:0.5,warm:true,open:0.3,green:true})+ground('#8fc27f','#6ea55f')+
+      cam(fl+ kenta(t,{x:1000,y:BASE,s:1.62,emote:'neutral',flip:true})+
+          can(1240,720,1.0,true)+ petals(t,16,'s10s')+
+          g(rect(-150,-62,300,104,'#2b2545',26,INK,0)+
+            txt(0,20,['１日め','２日め','３日め'][day],72,'#fff'),'translate(320,300)'),
+          {z:1.04+p*0.04,zx:1100,zy:720});
+  }
+  const p=seg(u,0.78,1);
   return base+ cam(fl+ crowd(t,'s10c',7,200,1760,800,0.85)+
         hana(t,{x:700,y:BASE,s:1.5,emote:'happy'})+
         kenta(t,{x:1060,y:BASE,s:1.55,emote:'happy'})+ can(1200,720,0.95,true)+
@@ -677,19 +800,20 @@ SCENES.end = (u,t)=>{
   for(let i=0;i<90;i++){const x=r()*W, y=HZ+60+r()*400;
     fl+=flower(x,y,0.55+r()*0.75,[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
   const base = sky('#8fd0ee','#fdf7ee')+cloud(360,145,1.1)+cloud(1510,185,0.9)+
-      danchi('c',{lit:0.5,warm:true,open:0.3})+ground('#8fc27f','#6ea55f');
-  if(u<0.55){ const p=seg(u,0,0.55);
+      danchi('c',{lit:0.5,warm:true,open:0.3,green:true})+ground('#8fc27f','#6ea55f');
+  if(u<0.48){ const p=seg(u,0,0.48);
     return base+ cam(fl+
-          g(rect(-11,-118,22,140,'#a98868',7,INK,5)+
-            g(rect(-34,-18,68,36,C.collar,11,INK,5),'translate(0,-108)')+
-            `<g opacity="${0.32+0.24*Math.sin(t*2.2)}">`+circ(0,-108,58,C.yellow)+`</g>`,
-            'translate(960,830)')+
+          // 花にかこまれた場所に、シロの首輪だけがそっと置いてある
+          g(ell(0,26,120,34,'#7db06c')+
+            g(rect(-46,-24,92,48,C.collar,14,INK,6)+circ(46,0,12,C.collar,INK,5),'')+
+            `<g opacity="${0.30+0.22*Math.sin(t*2.2)}">`+circ(0,0,74,C.yellow)+`</g>`,
+            'translate(960,870)')+
           hana(t,{x:640,y:BASE,s:1.5,emote:'happy'})+
           kenta(t,{x:1300,y:BASE,s:1.55,emote:'happy',flip:true})+
           petals(t,24,'endp'),
           {z:1.08-p*0.08,zy:720});
   }
-  const p=seg(u,0.55,1);
+  const p=seg(u,0.48,1);
   const pop=smooth(clamp(p*2.6));
   return base+ cam(fl+petals(t,28,'endq'),{z:1.0,zy:720})+
     `<g opacity="${lerp(0,0.74,pop)}">`+rect(0,0,W,H,'#2b2545')+`</g>`+
@@ -720,7 +844,8 @@ window.__seek = function(tt){
 
   const e=eventAt(tt);
   let text = (e && e.sub && tt<=e.end+0.45) ? e.sub : '';
-  if(sceneId==='end' && u>0.55) text='';
+  if(sceneId==='end' && u>0.48) text='';
+  if(sceneId==='op' && u>0.66) text='';
   sub.textContent = text;
   const col={N:'#ffffff',hana:'#ffe9a8',kenta:'#c8f5e6',baa:'#efe2ff',all:'#ffd9e6'};
   sub.style.color = (e && col[e.speaker]) ? col[e.speaker] : '#ffffff';
