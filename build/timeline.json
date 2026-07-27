@@ -1,5 +1,5 @@
 {
- "total": 296.217,
+ "total": 298.209,
  "fps": 24,
  "events": [
   {
@@ -83,478 +83,478 @@
    "scene": "s2",
    "speaker": "hana",
    "start": 39.25,
-   "end": 41.925,
+   "end": 42.4,
    "sub": "……こんな ところで、\nひとりぼっち？"
   },
   {
    "kind": "line",
    "scene": "s2",
    "speaker": "N",
-   "start": 42.375,
-   "end": 47.107,
+   "start": 42.85,
+   "end": 47.582,
    "sub": "ハナは その子を\nそっと だきあげました。"
   },
   {
    "kind": "line",
    "scene": "s3",
    "speaker": "N",
-   "start": 47.557,
-   "end": 50.347,
+   "start": 48.032,
+   "end": 50.982,
    "sub": "ふいて、みがいて、\nじゅうでんして。"
   },
   {
    "kind": "line",
    "scene": "s3",
    "speaker": "N",
-   "start": 50.797,
-   "end": 56.786,
+   "start": 51.432,
+   "end": 57.421,
    "sub": "その よる ハナは\nずっと ドライバーを\nにぎって いました。"
   },
   {
    "kind": "hold",
    "scene": "s3",
-   "start": 57.236,
-   "end": 59.436,
+   "start": 57.871,
+   "end": 60.071,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s3",
    "speaker": "N",
-   "start": 59.436,
-   "end": 61.098,
+   "start": 60.071,
+   "end": 61.733,
    "sub": "あさ。ピピッ。"
   },
   {
    "kind": "line",
    "scene": "s3",
    "speaker": "hana",
-   "start": 61.548,
-   "end": 65.863,
+   "start": 62.183,
+   "end": 66.498,
    "sub": "うごいた……！\nきみ、きょうから シロだよ！"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "N",
-   "start": 66.313,
-   "end": 71.942,
+   "start": 66.948,
+   "end": 72.577,
    "sub": "つぎの日。シロは なかにわで\nいきなり ほりはじめました。"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "shiro",
-   "start": 72.392,
-   "end": 73.602,
+   "start": 73.027,
+   "end": 74.238,
    "sub": "ここほれ、ワン！"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "N",
-   "start": 74.052,
-   "end": 76.309,
+   "start": 74.688,
+   "end": 76.945,
    "sub": "出てきたのは、あきかん。"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "shiro",
-   "start": 76.759,
-   "end": 77.97,
+   "start": 77.395,
+   "end": 78.605,
    "sub": "ここほれ、ワン！"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "N",
-   "start": 78.42,
-   "end": 81.677,
+   "start": 79.055,
+   "end": 82.312,
    "sub": "出てきたのは、\nまがった スプーン。"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "shiro2",
-   "start": 82.127,
-   "end": 83.388,
+   "start": 82.762,
+   "end": 84.312,
    "sub": "ここほれ、ワンワン！"
   },
   {
    "kind": "hold",
    "scene": "s4",
-   "start": 83.838,
-   "end": 85.038,
+   "start": 84.762,
+   "end": 85.962,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "N",
-   "start": 85.038,
-   "end": 91.991,
+   "start": 85.962,
+   "end": 92.915,
    "sub": "ふるい かんかん。\n中には しゃしんと てがみと\nたねが ひとつぶ。"
   },
   {
    "kind": "hold",
    "scene": "s4",
-   "start": 92.441,
-   "end": 93.341,
+   "start": 93.365,
+   "end": 94.265,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "baa",
-   "start": 93.341,
-   "end": 102.339,
+   "start": 94.265,
+   "end": 103.263,
    "sub": "ごじゅうねん まえに\nみんなで うめたのさ。\n花で いっぱいに して ね。"
   },
   {
    "kind": "line",
    "scene": "s4",
    "speaker": "hana",
-   "start": 102.789,
-   "end": 104.772,
+   "start": 103.713,
+   "end": 105.696,
    "sub": "……やって みる。"
   },
   {
    "kind": "line",
    "scene": "s4b",
    "speaker": "N",
-   "start": 105.222,
-   "end": 112.977,
+   "start": 106.146,
+   "end": 113.901,
    "sub": "ハナは その たねを うえて\nまいにち 水を やりました。"
   },
   {
    "kind": "hold",
    "scene": "s4b",
-   "start": 113.427,
-   "end": 115.027,
+   "start": 114.351,
+   "end": 115.951,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s4b",
    "speaker": "N",
-   "start": 115.027,
-   "end": 119.822,
+   "start": 115.951,
+   "end": 120.746,
    "sub": "けれど いくら まっても\nめは 出ませんでした。"
   },
   {
    "kind": "line",
    "scene": "s4b",
    "speaker": "hana",
-   "start": 120.272,
-   "end": 121.411,
+   "start": 121.196,
+   "end": 122.346,
    "sub": "……どうして。"
   },
   {
    "kind": "line",
    "scene": "s4b",
    "speaker": "baa",
-   "start": 121.861,
-   "end": 125.636,
+   "start": 122.796,
+   "end": 126.571,
    "sub": "つちが、まだ つめたいのさ。"
   },
   {
    "kind": "line",
    "scene": "s4b",
    "speaker": "N",
-   "start": 126.086,
-   "end": 133.308,
+   "start": 127.021,
+   "end": 134.243,
    "sub": "その ころ よるの なかにわに\nシロが ひとりで いました。"
   },
   {
    "kind": "line",
    "scene": "s5",
    "speaker": "N",
-   "start": 133.758,
-   "end": 139.357,
+   "start": 134.693,
+   "end": 140.292,
    "sub": "ある日 となりの とうの\nケンタが やって きました。"
   },
   {
    "kind": "line",
    "scene": "s5",
    "speaker": "kenta",
-   "start": 139.807,
-   "end": 144.48,
+   "start": 140.742,
+   "end": 145.692,
    "sub": "その ロボット\nおれにも かして。\nぜったい バズるって！"
   },
   {
    "kind": "line",
    "scene": "s5",
    "speaker": "N",
-   "start": 144.93,
-   "end": 151.106,
+   "start": 146.142,
+   "end": 152.317,
    "sub": "ケンタは みんなを\nびっくり させたくて\nあせって いました。"
   },
   {
    "kind": "line",
    "scene": "s5",
    "speaker": "hana",
-   "start": 151.556,
-   "end": 153.751,
+   "start": 152.767,
+   "end": 154.962,
    "sub": "……やさしく、してね。"
   },
   {
    "kind": "line",
    "scene": "s6",
    "speaker": "N",
-   "start": 154.201,
-   "end": 159.498,
+   "start": 155.412,
+   "end": 160.71,
    "sub": "けれど ほっても ほっても\n出てくるのは\nゴミ ばかり。"
   },
   {
    "kind": "line",
    "scene": "s6",
    "speaker": "kenta",
-   "start": 159.948,
-   "end": 164.906,
+   "start": 161.16,
+   "end": 166.117,
    "sub": "ちがう こんなんじゃ ない！\nもっと おたから\nほれって！"
   },
   {
    "kind": "hold",
    "scene": "s6",
-   "start": 165.356,
-   "end": 166.356,
+   "start": 166.567,
+   "end": 167.567,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s6",
    "speaker": "N",
-   "start": 166.356,
-   "end": 167.791,
+   "start": 167.567,
+   "end": 169.002,
    "sub": "ガシャン。"
   },
   {
    "kind": "line",
    "scene": "s6",
    "speaker": "N",
-   "start": 168.241,
-   "end": 172.901,
+   "start": 169.452,
+   "end": 174.112,
    "sub": "シロの 目の ひかりが\nすうっと きえました。"
   },
   {
    "kind": "line",
    "scene": "s6",
    "speaker": "kenta",
-   "start": 173.351,
-   "end": 174.752,
+   "start": 174.562,
+   "end": 175.964,
    "sub": "……あ。"
   },
   {
    "kind": "line",
    "scene": "s7",
    "speaker": "N",
-   "start": 175.202,
-   "end": 178.364,
+   "start": 176.414,
+   "end": 179.964,
    "sub": "ふいても、みがいても、\nじゅうでんしても。"
   },
   {
    "kind": "hold",
    "scene": "s7",
-   "start": 178.814,
-   "end": 180.214,
+   "start": 180.414,
+   "end": 181.814,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s7",
    "speaker": "N",
-   "start": 180.214,
-   "end": 184.181,
+   "start": 181.814,
+   "end": 185.781,
    "sub": "シロは もう\nワンとは いいませんでした。"
   },
   {
    "kind": "line",
    "scene": "s7",
    "speaker": "baa",
-   "start": 184.631,
-   "end": 191.747,
+   "start": 186.231,
+   "end": 193.347,
    "sub": "ないて いいよ。\nちゃんと かなしむのは\n大事な ことだから。"
   },
   {
    "kind": "line",
    "scene": "s7",
    "speaker": "hana",
-   "start": 192.197,
-   "end": 196.226,
+   "start": 193.797,
+   "end": 197.826,
    "sub": "……ごめんね。\nもっと あそびたかったね。"
   },
   {
    "kind": "line",
    "scene": "s8",
    "speaker": "N",
-   "start": 196.676,
-   "end": 202.756,
+   "start": 198.276,
+   "end": 204.356,
    "sub": "その とき。\nシロの おなかが\nすこし ひらいて いました。"
   },
   {
    "kind": "hold",
    "scene": "s8",
-   "start": 203.206,
-   "end": 204.806,
+   "start": 204.806,
+   "end": 206.406,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s8",
    "speaker": "N",
-   "start": 204.806,
-   "end": 208.421,
+   "start": 206.406,
+   "end": 210.02,
    "sub": "中には つちと\nたねが いっぱい。"
   },
   {
    "kind": "line",
    "scene": "s8",
    "speaker": "N",
-   "start": 208.871,
-   "end": 212.962,
+   "start": 210.47,
+   "end": 214.562,
    "sub": "シロは ほって いたんじゃ\nありませんでした。"
   },
   {
    "kind": "line",
    "scene": "s8",
    "speaker": "N",
-   "start": 213.412,
-   "end": 219.622,
+   "start": 215.012,
+   "end": 221.221,
    "sub": "まいにち すこしずつ\nなかにわじゅうに\nうめて いたのです。"
   },
   {
    "kind": "line",
    "scene": "s8",
    "speaker": "baa",
-   "start": 220.072,
-   "end": 225.346,
+   "start": 221.671,
+   "end": 226.945,
    "sub": "ごじゅうねん\nずっと まって いたんだねえ。"
   },
   {
    "kind": "line",
    "scene": "s9",
    "speaker": "N",
-   "start": 225.796,
-   "end": 230.394,
+   "start": 227.395,
+   "end": 231.994,
    "sub": "ふゆが すぎて、\nはるが きました。"
   },
   {
    "kind": "line",
    "scene": "s9",
    "speaker": "N",
-   "start": 230.844,
-   "end": 234.644,
+   "start": 232.444,
+   "end": 236.243,
    "sub": "ひびわれから、めが。\nめから、つぼみが。"
   },
   {
    "kind": "line",
    "scene": "s9",
    "speaker": "N",
-   "start": 235.094,
-   "end": 236.992,
+   "start": 236.693,
+   "end": 238.592,
    "sub": "つぼみから――"
   },
   {
    "kind": "line",
    "scene": "s9",
    "speaker": "all",
-   "start": 237.442,
-   "end": 238.743,
+   "start": 239.042,
+   "end": 240.343,
    "sub": "わあああ！"
   },
   {
    "kind": "line",
    "scene": "s9",
    "speaker": "N",
-   "start": 239.193,
-   "end": 244.564,
+   "start": 240.793,
+   "end": 246.164,
    "sub": "はいいろ だった なかにわは\n花で いっぱいに\nなりました。"
   },
   {
    "kind": "line",
    "scene": "s9",
    "speaker": "N",
-   "start": 245.014,
-   "end": 252.104,
+   "start": 246.614,
+   "end": 253.704,
    "sub": "ハナが うえた ひとつぶも\nまん中で さいて いました。"
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "N",
-   "start": 252.554,
-   "end": 257.434,
+   "start": 254.154,
+   "end": 259.034,
    "sub": "花の はしっこに\nケンタが 立って いました。"
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "kenta",
-   "start": 257.884,
-   "end": 260.683,
+   "start": 259.484,
+   "end": 262.634,
    "sub": "……あの。ごめん。\nこわして、ごめん。"
   },
   {
    "kind": "hold",
    "scene": "s10",
-   "start": 261.133,
-   "end": 262.333,
+   "start": 263.084,
+   "end": 264.284,
    "sub": null
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "hana",
-   "start": 262.333,
-   "end": 264.842,
+   "start": 264.284,
+   "end": 266.834,
    "sub": "じゃあ、みずやり てつだって。"
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "kenta",
-   "start": 265.292,
-   "end": 267.093,
+   "start": 267.284,
+   "end": 269.085,
    "sub": "……えっ。……うん。"
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "N",
-   "start": 267.543,
-   "end": 273.835,
+   "start": 269.535,
+   "end": 275.827,
    "sub": "つぎの日も、その つぎの日も。\nどうがは 一度も とりません。"
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "kenta",
-   "start": 274.285,
-   "end": 276.962,
+   "start": 276.277,
+   "end": 278.953,
    "sub": "……こっちの ほうが、いいや。"
   },
   {
    "kind": "line",
    "scene": "s10",
    "speaker": "N",
-   "start": 277.412,
-   "end": 283.252,
+   "start": 279.403,
+   "end": 285.244,
    "sub": "この なかにわには\nまいにち 人が あつまります。"
   },
   {
    "kind": "line",
    "scene": "end",
    "speaker": "N",
-   "start": 283.702,
-   "end": 292.367,
+   "start": 285.694,
+   "end": 294.359,
    "sub": "ほんとうに ほしい ものは\nうめて、まって、\nそだてる ものです。"
   },
   {
    "kind": "hold",
    "scene": "end",
-   "start": 292.817,
-   "end": 296.217,
+   "start": 294.809,
+   "end": 298.209,
    "sub": null
   }
  ],
@@ -569,47 +569,47 @@
   },
   "s2": {
    "start": 29.06,
-   "end": 47.557
+   "end": 48.032
   },
   "s3": {
-   "start": 47.557,
-   "end": 66.313
+   "start": 48.032,
+   "end": 66.948
   },
   "s4": {
-   "start": 66.313,
-   "end": 105.222
+   "start": 66.948,
+   "end": 106.146
   },
   "s4b": {
-   "start": 105.222,
-   "end": 133.758
+   "start": 106.146,
+   "end": 134.693
   },
   "s5": {
-   "start": 133.758,
-   "end": 154.201
+   "start": 134.693,
+   "end": 155.412
   },
   "s6": {
-   "start": 154.201,
-   "end": 175.202
+   "start": 155.412,
+   "end": 176.414
   },
   "s7": {
-   "start": 175.202,
-   "end": 196.676
+   "start": 176.414,
+   "end": 198.276
   },
   "s8": {
-   "start": 196.676,
-   "end": 225.796
+   "start": 198.276,
+   "end": 227.395
   },
   "s9": {
-   "start": 225.796,
-   "end": 252.554
+   "start": 227.395,
+   "end": 254.154
   },
   "s10": {
-   "start": 252.554,
-   "end": 283.702
+   "start": 254.154,
+   "end": 285.694
   },
   "end": {
-   "start": 283.702,
-   "end": 296.217
+   "start": 285.694,
+   "end": 298.209
   }
  },
  "order": [

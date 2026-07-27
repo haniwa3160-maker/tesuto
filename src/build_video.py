@@ -113,13 +113,33 @@ def main():
         # 縦型は 1920x1080 の画をセンター基準で切り出す（CSS で拡大＋クリップ）
         browser, page = launch(pw, tl, w, h)
         if args.shorts:
+            # 16:9 の絵を 1.5 倍に拡大して左右を少し切り、上下の余白は
+            # ブランド色の背景＋タイトルで埋める（全部を切ると画がもたない）
             page.add_style_tag(content="""
-              #stage { width:1080px; height:1920px; }
-              #art { position:absolute; left:50%; top:50%; width:2880px; height:1620px;
+              body { background:#2b2545; }
+              #stage { width:1080px; height:1920px;
+                       background:linear-gradient(160deg,#3b3566 0%,#2b2545 60%,#1f1b36 100%); }
+              #art { position:absolute; left:50%; top:50%; width:1620px; height:911px;
                      transform:translate(-50%,-50%); }
-              #sub { bottom:300px; font-size:62px; padding:0 60px; }
-              #scrim { height:620px; }
+              #scrim { bottom:505px; height:300px; }
+              #sub { bottom:360px; font-size:54px; padding:0 50px; }
+              #shortsTitle { position:absolute; top:150px; left:0; right:0; text-align:center;
+                     font-family:"Rounded Mplus 1c",sans-serif; font-weight:800;
+                     font-size:96px; color:#fff; letter-spacing:2px; }
+              #shortsSub { position:absolute; top:270px; left:0; right:0; text-align:center;
+                     font-family:"Rounded Mplus 1c",sans-serif; font-weight:800;
+                     font-size:42px; color:#ffe6a8; }
+              #shortsFoot { position:absolute; bottom:150px; left:0; right:0; text-align:center;
+                     font-family:"Rounded Mplus 1c",sans-serif; font-weight:800;
+                     font-size:44px; color:#c9c4e6; }
             """)
+            page.evaluate("""() => {
+              const mk=(id,txt)=>{const d=document.createElement('div');d.id=id;
+                d.textContent=txt;document.getElementById('stage').appendChild(d);};
+              mk('shortsTitle','ここほれ、シロ！');
+              mk('shortsSub','〜 はなさかじいさん 2026 〜');
+              mk('shortsFoot','本編は チャンネルから');
+            }""")
         proc = ffmpeg_proc(w, h, fps, audio, out)
         for i, t in enumerate(times):
             page.evaluate("t => window.__seek(t)", t)
