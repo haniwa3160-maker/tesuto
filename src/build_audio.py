@@ -12,7 +12,7 @@ from scipy.io import wavfile
 from scipy.signal import lfilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from story import BEATS, VOICES, SCENE_ORDER, MIN_SUB  # noqa: E402
+from story import BEATS, VOICES, SCENE_ORDER, MIN_SUB, MAX_CPS  # noqa: E402
 
 SR = 48000
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -280,9 +280,12 @@ def main():
             dur = len(x) / SR
             narration.append((int(cursor * SR), x))
             pad = b["pad"]
-            # 短いセリフでも字幕が読めるだけの時間を確保する
-            if dur + pad + 0.45 < MIN_SUB:
-                pad = MIN_SUB - dur - 0.45
+            # 字幕は end+0.45 まで出るので、実際の表示時間は dur+pad になる。
+            # ①最低 MIN_SUB 秒 ②読む速さが MAX_CPS 字/秒 を超えない、の両方を満たす
+            n_chars = len(b["sub"].replace("\n", ""))
+            need = max(MIN_SUB, n_chars / MAX_CPS)
+            if dur + pad < need:
+                pad = need - dur
             events.append({"kind": "line", "scene": sc, "speaker": b["speaker"],
                            "start": round(cursor, 3),
                            "end": round(cursor + dur + pad - 0.45, 3),

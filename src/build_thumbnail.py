@@ -26,10 +26,11 @@ OVERLAY = """
   b.style.cssText=css+'top:236px;font-size:62px;color:#ffe6a8;';
   b.textContent='〜 はなさかじいさん 2026 〜'; s.appendChild(b);
   const c=document.createElement('div');
-  c.style.cssText='position:absolute;left:50%;transform:translateX(-50%);bottom:44px;'+
-    'background:#ff7a6b;color:#fff;font-weight:800;font-size:58px;padding:20px 52px;'+
-    'border-radius:999px;border:9px solid #2b2545;font-family:"Rounded Mplus 1c",sans-serif;';
-  c.textContent='すてられた ロボット犬が、ほって いた もの'; s.appendChild(c);
+  c.style.cssText='position:absolute;left:50%;transform:translateX(-50%);bottom:52px;'+
+    'background:#ff7a6b;color:#fff;font-weight:800;font-size:64px;padding:18px 56px;'+
+    'white-space:nowrap;border-radius:999px;border:9px solid #2b2545;'+
+    'font-family:"Rounded Mplus 1c",sans-serif;';
+  c.textContent='この犬、なにを ほって いた と 思う？'; s.appendChild(c);
 })()
 """
 
@@ -38,7 +39,7 @@ def main():
     tl = json.load(open(os.path.join(BUILD, "timeline.json"), encoding="utf-8"))
     # 動画の 1 コマ目と絵を揃える（R6③）：シロが掘っているカット
     op = tl["scenes"]["op"]
-    t = op["start"] + (op["end"] - op["start"]) * 0.30
+    t = op["start"] + (op["end"] - op["start"]) * 0.22
     os.makedirs(OUT, exist_ok=True)
     with sync_playwright() as pw:
         b = pw.chromium.launch(executable_path=CHROME, args=["--hide-scrollbars"])
