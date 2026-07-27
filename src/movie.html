@@ -1,0 +1,729 @@
+<meta charset="utf-8">
+<title>ここほれ、シロ！</title>
+<style>
+  html, body { margin:0; padding:0; background:#000; overflow:hidden; }
+  #stage { position:relative; width:1920px; height:1080px; overflow:hidden;
+           font-family:"Rounded Mplus 1c","M PLUS Rounded 1c",sans-serif; }
+  #art { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  #scrim { position:absolute; left:0; right:0; bottom:0; height:300px; pointer-events:none;
+           background:linear-gradient(to bottom, rgba(28,24,54,0) 0%, rgba(28,24,54,.42) 55%, rgba(28,24,54,.62) 100%); }
+  #sub { position:absolute; left:0; right:0; bottom:46px; text-align:center;
+         font-weight:800; font-size:52px; line-height:1.32; color:#fff;
+         white-space:pre-line; padding:0 150px;
+         text-shadow: 0 0 14px rgba(21,18,40,.95),
+                      4px 4px 0 #2b2545, -4px 4px 0 #2b2545,
+                      4px -4px 0 #2b2545, -4px -4px 0 #2b2545,
+                      0 5px 0 #2b2545, 0 -5px 0 #2b2545,
+                      5px 0 0 #2b2545, -5px 0 0 #2b2545; }
+  #veil { position:absolute; inset:0; background:#1a1c2e; opacity:0; pointer-events:none; }
+</style>
+<div id="stage">
+  <svg id="art" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice"></svg>
+  <div id="scrim"></div>
+  <div id="veil"></div>
+  <div id="sub"></div>
+</div>
+<script>
+// ===================================================================== 基本
+const W = 1920, H = 1080;
+const HZ   = 560;   // 地平線
+const BASE = 860;   // 立ち位置（足元）
+const CS   = 1.5;   // キャラの基準スケール
+const INK  = '#33305a';
+const C = {
+  skin:'#ffd9b8', hair:'#4a3226', hoodie:'#ffcf5c', jeans:'#5b7fb5',
+  kentaCap:'#2ec4a0', kentaTop:'#4b7fa8', kentaPant:'#3c5a72',
+  baaHair:'#ded9e6', baaCloth:'#b79ddb',
+  robot:'#fdfdff', robotShade:'#dde3ef', collar:'#ffcf5c', eye:'#41d3f0',
+  concrete:'#b9bcc6', concrete2:'#a7abb6', wall:'#cfd3dc', wall2:'#bcc1cc',
+  green:'#6fc46a', green2:'#4f9e4c', soil:'#8b6248', soil2:'#6f4c37',
+  pink:'#ff8fb1', yellow:'#ffd166', red:'#ff7a6b', purple:'#b18cf0',
+};
+const clamp=(v,a=0,b=1)=>v<a?a:v>b?b:v;
+const lerp=(a,b,u)=>a+(b-a)*clamp(u);
+const smooth=u=>{u=clamp(u);return u*u*(3-2*u);};
+const seg=(u,a,b)=>clamp((u-a)/(b-a));
+const ease=(u,a,b)=>smooth(seg(u,a,b));
+const bob=(t,sp=1,amp=1)=>Math.sin(t*sp*2*Math.PI)*amp;
+const R=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}
+            return()=>{h^=h<<13;h^=h>>>17;h^=h<<5;return((h>>>0)%100000)/100000;};};
+
+const g=(inner,tf='')=>`<g${tf?` transform="${tf}"`:''}>${inner}</g>`;
+const rect=(x,y,w,h,f,r=0,st=INK,sw=0)=>
+  `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${f}"${sw?` stroke="${st}" stroke-width="${sw}"`:''}/>`;
+const circ=(x,y,r,f,st=INK,sw=0)=>
+  `<circle cx="${x}" cy="${y}" r="${r}" fill="${f}"${sw?` stroke="${st}" stroke-width="${sw}"`:''}/>`;
+const ell=(x,y,rx,ry,f,st=INK,sw=0)=>
+  `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${f}"${sw?` stroke="${st}" stroke-width="${sw}"`:''}/>`;
+const path=(d,f='none',st=INK,sw=6,cap='round')=>
+  `<path d="${d}" fill="${f}" stroke="${st}" stroke-width="${sw}" stroke-linecap="${cap}" stroke-linejoin="round"/>`;
+const txt=(x,y,s,size,f='#fff',w=800,anchor='middle')=>
+  `<text x="${x}" y="${y}" font-size="${size}" font-weight="${w}" fill="${f}" text-anchor="${anchor}" font-family="Rounded Mplus 1c, sans-serif">${s}</text>`;
+
+// ===================================================================== キャラ（原点＝足元）
+function hana(t,{x=0,y=BASE,s=CS,emote='neutral',arm='down',flip=false,walk=0}={}){
+  const b = bob(t,0.5,4);
+  const blink = (Math.sin(t*1.7)>0.965)?1:0;
+  const eye = (dx)=>{
+    if(emote==='sad'||emote==='cry') return path(`M ${dx-13} -6 q 13 -10 26 0`,'none',INK,6);
+    if(emote==='happy') return path(`M ${dx-13} 2 q 13 -16 26 0`,'none',INK,7);
+    if(blink) return path(`M ${dx-12} -2 h 24`,'none',INK,6);
+    return circ(dx,-2,8.5,INK);
+  };
+  const mouth = {
+    neutral: path('M -10 34 q 10 6 20 0','none',INK,5),
+    sad:     path('M -12 40 q 12 -9 24 0','none',INK,5),
+    happy:   path('M -18 28 q 18 24 36 0','#8a4a52',INK,5),
+    wow:     ell(0,36,14,17,'#8a4a52',INK,5),
+    cry:     path('M -12 40 q 12 -9 24 0','none',INK,5),
+  }[emote];
+  const tears = (emote==='cry')
+      ? ell(-30,20+((t*70)%64),7,11,'#8fd3ef',INK,3)+ell(30,10+((t*70+32)%64),7,11,'#8fd3ef',INK,3) : '';
+  const armD = arm==='up'
+      ? 'M -46 -8 q -40 -28 -32 -62 M 46 -8 q 40 -28 32 -62'
+      : arm==='hold'
+      ? 'M -46 -2 q -32 26 -8 36 M 46 -2 q 32 26 8 36'
+      : 'M -46 -4 q -20 40 -12 60 M 46 -4 q 20 40 12 60';
+  const legSw = Math.sin(walk*2*Math.PI)*16;
+  const head = g(
+      circ(0,0,54,C.skin,INK,7)+
+      path('M -56 -6 q 4 -62 56 -62 q 52 0 56 62 q -16 -26 -30 -22 q -22 -18 -50 -6 q -20 8 -32 28 z',C.hair,INK,6)+
+      path('M 50 -18 q 48 6 40 56 q -6 40 -30 40 q 16 -34 -2 -60 q -10 -18 -18 -22 z',C.hair,INK,6)+
+      circ(54,-26,11,C.pink,INK,5)+
+      eye(-22)+eye(22)+mouth+tears+
+      circ(-40,20,11,'#ffb3b3')+circ(40,20,11,'#ffb3b3'),
+      `translate(0,${-120+b})`);
+  const body =
+      path('M -50 -20 q -8 74 -2 108 q 52 12 104 0 q 6 -34 -2 -108 q -26 -14 -50 -14 q -24 0 -50 14 z',C.hoodie,INK,7)+
+      path('M -30 -22 q 30 30 60 0','none',INK,6)+
+      rect(-52,-32,104,26,C.hoodie,13,INK,7)+
+      path(`M -22 88 v ${44+legSw}`,'none',C.jeans,26)+
+      path(`M  22 88 v ${44-legSw}`,'none',C.jeans,26)+
+      path(`M -22 ${132+legSw} h -8`,'none',INK,20)+
+      path(`M  22 ${132-legSw} h  8`,'none',INK,20)+
+      path(armD,'none',C.hoodie,24);
+  return g(g(body+head,'translate(0,-132)'),
+           `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+}
+
+function shiro(t,{x=0,y=BASE,s=CS,on=true,flip=false,dig=0,lie=false,glow=1}={}){
+  const wag = on? Math.sin(t*6)*22 : 0;
+  const b   = on? bob(t,1.1,3) : 0;
+  const digA= dig? Math.sin(t*14)*22 : 0;
+  const eyeCol = on? C.eye : '#a3a9b6';
+  const halo = on? `<circle cx="16" cy="-6" r="${26+4*Math.sin(t*5)}" fill="${C.eye}" opacity="${0.26*glow}"/>`:'';
+  const legs = lie
+      ? rect(-46,22,86,20,C.robotShade,10,INK,6)          // ふせた姿勢：脚をたたむ
+      : rect(-48,30,24,34,C.robot,11,INK,6)+rect(22,30,24,34,C.robot,11,INK,6)+
+        rect(-30,32,22,32,C.robotShade,11,INK,6)+rect(6,32,22,32,C.robotShade,11,INK,6);
+  const body =
+      rect(-62,-34,116,70,C.robot,32,INK,7)+
+      path('M -60 6 q 58 22 112 0 q 0 24 -12 28 q -44 10 -88 0 q -12 -6 -12 -28 z',C.robotShade)+
+      rect(-62,-34,116,70,'none',32,INK,7)+
+      circ(-26,-2,8,C.robotShade)+circ(0,-2,8,C.robotShade)+circ(26,-2,8,C.robotShade)+
+      legs+
+      g(path(`M 52 -20 q 36 ${lie?18:-6} 44 ${lie?4:-36}`,'none',INK,7)+
+        circ(96,lie?-16:-58,10,C.collar,INK,5), `rotate(${wag},52,-20)`);
+  const head = g(
+      // 耳：右は無事な丸い垂れ耳／左は欠けた小さな stub
+      path('M 22 -48 q 12 -50 52 -34 q -4 30 -18 40 z',C.robot,INK,6)+
+      path('M -34 -46 q 2 -24 20 -22 l -2 24 z',C.robot,INK,6)+
+      rect(-44,-52,92,80,C.robot,28,INK,7)+
+      // マズル
+      rect(-30,4,58,32,C.robotShade,16,INK,6)+ ell(0,10,11,8,INK)+
+      path('M 0 18 v 8','none',INK,5)+
+      halo+
+      circ(-12,-14,16,eyeCol,INK,6)+(on?circ(-7,-19,5.5,'#fff'):'')+
+      circ(26,-14,16,eyeCol,INK,6)+(on?circ(31,-19,5.5,'#fff'):''),
+      `translate(56,${-52+b}) rotate(${lie?14:0})`);
+  const collar = rect(-6,-22,32,58,C.collar,11,INK,6);
+  const inner  = g(collar+body+head, `translate(0,${b}) rotate(${digA*0.5},0,20)`);
+  return g(g(inner,`translate(0,${lie?-42:-64})`), `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+}
+
+function kenta(t,{x=0,y=BASE,s=CS,emote='neutral',phone=false,flip=false}={}){
+  const b = bob(t,0.45,4);
+  const eye = (dx)=>{
+    if(emote==='angry') return path(`M ${dx-14} -14 l 28 9`,'none',INK,6)+circ(dx,0,7.5,INK);
+    if(emote==='sorry') return path(`M ${dx-12} -2 q 12 9 24 0`,'none',INK,6);
+    if(emote==='happy') return path(`M ${dx-12} 2 q 12 -14 24 0`,'none',INK,6);
+    return circ(dx,-2,7.5,INK);
+  };
+  const mouth = {
+    neutral: path('M -10 32 q 10 5 20 0','none',INK,5),
+    angry:   path('M -16 38 q 16 -15 32 0','none',INK,6),
+    sorry:   path('M -12 38 q 12 -7 24 0','none',INK,5),
+    happy:   path('M -16 26 q 16 20 32 0','#8a4a52',INK,5),
+  }[emote];
+  const head = g(
+      circ(0,0,50,C.skin,INK,7)+
+      path('M -52 -14 q 6 -52 52 -52 q 46 0 52 52 q -30 -20 -52 -20 q -22 0 -52 20 z',C.hair,INK,6)+
+      path('M -54 -20 q 4 -56 54 -56 q 50 0 54 56 z',C.kentaCap,INK,7)+
+      path('M -80 -18 q 42 -16 80 -2 q -32 14 -80 2 z',C.kentaCap,INK,7)+
+      eye(-20)+eye(20)+mouth,
+      `translate(0,${-116+b})`);
+  const arms = phone
+      ? path('M -44 -4 q -8 -44 22 -50 M 44 -4 q 8 -44 -22 -50','none',C.kentaTop,22)
+      : path('M -44 -4 q -18 40 -10 58 M 44 -4 q 18 40 10 58','none',C.kentaTop,22);
+  const ph = phone
+      ? g(rect(-17,-28,34,56,'#2c2c3a',7,INK,5)+rect(-12,-22,24,44,'#89e0ff',4),'translate(0,-74)')
+      : '';
+  const body =
+      path('M -46 -18 q -8 72 -2 104 q 48 12 96 0 q 6 -32 -2 -104 q -24 -14 -46 -14 q -22 0 -46 14 z',C.kentaTop,INK,7)+
+      rect(-14,-30,28,20,C.skin,6)+
+      path('M -20 84 v 46','none',C.kentaPant,26)+
+      path('M  20 84 v 46','none',C.kentaPant,26)+
+      path('M -20 130 h -8','none',INK,20)+path('M 20 130 h 8','none',INK,20)+
+      arms+ph;
+  return g(g(body+head,'translate(0,-130)'), `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+}
+
+function baa(t,{x=0,y=BASE,s=CS*0.92,flip=false,emote='happy'}={}){
+  const b = bob(t,0.4,3);
+  const head = g(
+      circ(0,0,48,C.skin,INK,7)+
+      path('M -50 -8 q 6 -50 50 -50 q 44 0 50 50 q -32 -24 -50 -24 q -18 0 -50 24 z',C.baaHair,INK,6)+
+      circ(0,-58,21,C.baaHair,INK,6)+
+      circ(-22,-2,20,'none',INK,5)+circ(22,-2,20,'none',INK,5)+path('M -2 -2 h 4','none',INK,5)+
+      path('M -42 -6 l -8 -4 M 42 -6 l 8 -4','none',INK,5)+
+      circ(-22,0,6,INK)+circ(22,0,6,INK)+
+      (emote==='happy'?path('M -14 28 q 14 16 28 0','#8a4a52',INK,5)
+                      :path('M -10 30 q 10 5 20 0','none',INK,5))+
+      circ(-36,16,10,'#ffb3b3')+circ(36,16,10,'#ffb3b3'),
+      `translate(0,${-110+b})`);
+  const body =
+      path('M -44 -14 q -10 66 -4 96 q 46 12 92 0 q 6 -30 -4 -96 q -22 -12 -42 -12 q -20 0 -42 12 z',C.baaCloth,INK,7)+
+      path('M -42 -6 q -20 44 -12 62 M 42 -6 q 20 44 12 62','none',C.baaCloth,22)+
+      path('M -18 80 v 42','none','#7a6f8a',24)+path('M 18 80 v 42','none','#7a6f8a',24)+
+      path('M -18 122 h -8','none',INK,18)+path('M 18 122 h 8','none',INK,18);
+  return g(g(body+head,'translate(0,-122)'), `translate(${x},${y}) scale(${flip?-s:s},${s})`);
+}
+
+function crowd(t,seed,n,x0,x1,y,s){
+  const r=R('crowd'+seed); let o='';
+  const cols=[C.pink,C.yellow,C.purple,'#7fd1c9','#ff9f68','#8fd3ef'];
+  for(let i=0;i<n;i++){
+    const x=lerp(x0,x1,r()), sc=s*(0.85+r()*0.3), c=cols[Math.floor(r()*cols.length)];
+    const bb=Math.sin(t*(1.6+r()*1.4)+i)*5;
+    o+=g(circ(0,-76,26,C.skin,INK,5)+
+         path('M -32 -52 q -6 54 -2 76 q 34 8 68 0 q 4 -22 -2 -76 z',c,INK,5)+
+         path('M -13 24 v 26 M 13 24 v 26','none','#4c5570',14),
+         `translate(${x},${y+bb}) scale(${sc})`);
+  }
+  return o;
+}
+
+// ===================================================================== 背景
+function sky(a,b){
+  return `<defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>`+
+    rect(0,0,W,H,'url(#sk)');
+}
+function cloud(x,y,s,c='#fff'){
+  return g(ell(0,0,92,52,c)+ell(-72,16,58,38,c)+ell(74,18,52,34,c),`translate(${x},${y}) scale(${s})`);
+}
+// 団地（背景なので小さめ・軽め）
+function danchi(seed,{lit=0.3,warm=false,open=0}={}){
+  const specs=[[70,300,300,260],[400,240,340,320],[790,270,300,290],[1130,225,350,335],[1520,290,330,270]];
+  let o='';
+  specs.forEach((sp,k)=>{
+    const [x,y,w,h]=sp; const r=R(seed+k);
+    o+=rect(x,y,w,HZ-y+10,C.wall,10,INK,6)+rect(x,y,w,14,C.wall2,5,INK,4);
+    const cols=Math.max(2,Math.round(w/78)), rows=Math.max(2,Math.round((HZ-y)/72));
+    const ww=w/cols*0.52, wh=(HZ-y)/rows*0.46;
+    for(let i=0;i<cols;i++) for(let j=0;j<rows;j++){
+      const wx=x+w/cols*(i+0.5)-ww/2, wy=y+(HZ-y)/rows*(j+0.45)-wh/2;
+      const on=r()<lit;
+      o+=rect(wx,wy,ww,wh,on?(warm?'#ffd98a':'#cfe6f5'):'#98a0b0',5,INK,3.5);
+      if(r()<open) o+=rect(wx,wy,ww/2,wh,'#5d6478',3,INK,2.5);
+    }
+  });
+  return o;
+}
+function ground(col=C.concrete,edge='#9aa0ab'){
+  return rect(0,HZ,W,H-HZ,col)+path(`M 0 ${HZ} H ${W}`,'none',edge,6)+rect(0,HZ+6,W,10,'#c8ccd4');
+}
+function flower(x,y,s,col,t,ph=0){
+  const sw=Math.sin(t*1.6+ph)*5; let p='';
+  for(let i=0;i<5;i++){const a=i*72+sw*2;
+    p+=ell(Math.cos(a*Math.PI/180)*22,Math.sin(a*Math.PI/180)*22,16,16,col,INK,4);}
+  return g(path(`M 0 62 q ${sw} -32 0 -48`,'none',C.green2,7)+
+           ell(-14,34,14,8,C.green,INK,4)+ell(14,26,14,8,C.green,INK,4)+
+           g(p+circ(0,0,11,C.yellow,INK,4),`translate(${sw},0)`),
+           `translate(${x},${y}) scale(${s})`);
+}
+function sprout(x,y,s,grow,t){
+  const h=lerp(0,52,grow), sw=Math.sin(t*2+x)*3;
+  return g(ell(0,2,26*grow,9*grow,C.soil)+
+           path(`M 0 0 q ${sw} ${-h/2} 0 ${-h}`,'none',C.green2,8)+
+           (grow>0.35?ell(-15,-h+7,15*grow,9*grow,C.green,INK,4):'')+
+           (grow>0.55?ell(15,-h+19,15*grow,9*grow,C.green,INK,4):''),
+           `translate(${x},${y}) scale(${s})`);
+}
+function crack(x,y,s,seed='c'){
+  const r=R(seed); let d=`M ${x} ${y}`,cx=x,cy=y;
+  for(let i=0;i<7;i++){cx+=(r()-0.35)*76*s;cy-=(22+r()*28)*s;d+=` L ${cx} ${cy}`;}
+  return path(d,'none','#8f939f',5*s);
+}
+function dust(t,x,y,n,seed,col='#a98868'){
+  const r=R(seed); let o='';
+  for(let i=0;i<n;i++){const ph=(t*1.6+r())%1;
+    o+=circ(x+(r()-0.5)*240*ph*1.6, y-ph*170-r()*30, lerp(20,4,ph), col);}
+  return `<g opacity="0.72">${o}</g>`;
+}
+function petals(t,n,seed){
+  const r=R(seed); let o='';
+  const cols=[C.pink,'#ffc2d4',C.yellow,'#fff'];
+  for(let i=0;i<n;i++){
+    const sp=0.5+r()*0.7, ph=(t*sp*0.16+r())%1;
+    o+=g(ell(0,0,16,10,cols[Math.floor(r()*4)]),
+         `translate(${(r()*W+Math.sin(t*sp+i)*90)%W},${ph*(H+160)-80}) rotate(${(t*90*sp+i*40)%360})`);
+  }
+  return `<g opacity="0.92">${o}</g>`;
+}
+function snow(t,n,seed){
+  const r=R(seed); let o='';
+  for(let i=0;i<n;i++){const sp=0.4+r()*0.6, ph=(t*sp*0.13+r())%1;
+    o+=circ((r()*W+Math.sin(t*sp+i)*50)%W, ph*(H+120)-60, 4+r()*6,'#fff');}
+  return `<g opacity="0.9">${o}</g>`;
+}
+function rainOn(t,x,y,w,h){
+  const r=R('rain'); let o='';
+  for(let i=0;i<26;i++){const ph=(t*0.9+r())%1;
+    o+=path(`M ${x+r()*w} ${y+ph*h} l -4 26`,'none','#a9c7dd',4);}
+  return o;
+}
+function cam(inner,{zx=W/2,zy=HZ+120,z=1,dx=0,dy=0}={}){
+  return g(inner,`translate(${zx+dx},${zy+dy}) scale(${z}) translate(${-zx},${-zy})`);
+}
+// 屋内（部屋）の基本セット
+function room({wall='#f4efe6',back='#e7e2da',win='#cfe0ee',night=false,rain=false,t=0,desk=true}={}){
+  return rect(0,0,W,H,back)+
+    rect(60,60,1800,900,wall,26,INK,8)+
+    rect(1240,150,540,420,win,18,INK,8)+
+    (rain?rainOn(t,1260,160,500,400):'')+
+    (night?circ(1620,270,54,'#fff4c2',INK,6)+circ(1330,230,5,'#fff')+circ(1420,420,4,'#fff'):
+           rect(1280,300,120,270,'#aab0bb',8)+rect(1430,260,140,310,'#9ea5b1',8)+
+           rect(1600,330,130,240,'#aab0bb',8))+
+    rect(1240,150,540,420,'none',18,INK,8)+
+    path('M 1510 150 v 420 M 1240 360 h 540','none',INK,7)+
+    // 床（机は前景として seat() で最後に重ねる）
+    rect(0,900,W,H-900,'#d9c9b2')+path('M 0 900 H 1920','none',INK,6);
+}
+// 机（キャラの手前に重ねる前景）
+const DESK_Y = 838;
+function desk(){
+  return rect(210,DESK_Y,1500,46,'#b98b5e',13,INK,7)+
+         rect(286,DESK_Y+46,44,150,'#a97b50',8,INK,6)+
+         rect(1590,DESK_Y+46,44,150,'#a97b50',8,INK,6);
+}
+
+// ===================================================================== シーン
+const SCENES = {};
+
+// ---- S1 ひとりのハナ
+SCENES.s1 = (u,t)=>{
+  if(u<0.30){ const p=seg(u,0,0.30);
+    return sky('#c2c9d4','#e2e6ec')+cloud(400+p*70,180,1.05,'#eef1f5')+cloud(1480-p*60,140,0.9,'#eef1f5')+
+      cam(danchi('a',{lit:0.16})+ground()+
+          g(rect(0,-108,260,108,'#eef0f4',14,INK,7)+rect(170,-158,104,100,'#ff9f68',14,INK,7)+
+            rect(192,-144,64,46,'#bfe6f7',7,INK,5)+circ(56,10,34,'#3a3a48',INK,6)+circ(226,10,34,'#3a3a48',INK,6)+
+            circ(56,10,12,'#c9ccd4')+circ(226,10,12,'#c9ccd4'),
+            `translate(${1280-p*140},790)`)+
+          crowd(t,'s1a',2,620,820,800,0.75),
+          {z:1+p*0.10,zy:640,dx:-p*40});
+  }
+  if(u<0.64){ const p=seg(u,0.30,0.64);
+    return room({wall:'#efe9df',back:'#ded8ce',desk:false})+
+      cam(g(rect(0,0,230,184,'#d9a86a',13,INK,7)+path('M 0 58 h 230','none',INK,5),'translate(170,716)')+
+          g(rect(0,0,196,162,'#c99a5e',13,INK,7)+path('M 0 50 h 196','none',INK,5),'translate(430,738)')+
+          hana(t,{x:880,y:900,s:1.6,emote:'sad'}),
+          {z:1.02+p*0.12,zx:940,zy:560,dx:-p*50});
+  }
+  const p=seg(u,0.64,1);
+  return sky('#bcc3cd','#dde1e8')+
+    cam(danchi('a',{lit:0.10})+ground(C.concrete)+
+        crack(680,880,1.35,'q1')+crack(1180,910,1.2,'q2')+crack(400,940,1.1,'q3')+
+        crack(1560,880,1.0,'q4')+
+        g(rect(0,0,300,34,'#9b8f7d',10,INK,6)+rect(26,34,24,74,'#7d7365',8,INK,5)+
+          rect(250,34,24,74,'#7d7365',8,INK,5),'translate(1380,690)')+
+        // 風に転がる空きペットボトルだけが動いている
+        g(rect(0,-22,86,44,'#cfe6f5',20,INK,6)+rect(78,-12,20,24,'#8fd3ef',8,INK,5),
+          `translate(${(260+t*70)%1700},${900+Math.sin(t*4)*6}) rotate(${t*90%360})`)+
+        `<g opacity="${lerp(0.1,0.4,p)}">`+dust(t,960,860,6,'s1d','#c8ccd4')+`</g>`,
+        {z:1.0+p*0.16,zy:760});
+};
+
+// ---- S2 シロとの出会い
+SCENES.s2 = (u,t)=>{
+  const junk =
+    g(rect(0,0,230,250,'#c8ccd6',18,INK,7)+circ(115,140,70,'#eef1f6',INK,6)+circ(115,140,46,'#9aa2b0')+
+      rect(24,24,182,46,'#aeb5c1',9,INK,5),'translate(120,540)')+
+    g(rect(0,0,170,170,'#d9a86a',12,INK,7)+path('M 0 52 h 170','none',INK,5),'translate(400,620)')+
+    g(rect(0,0,140,24,'#a98868',7,INK,6)+rect(12,24,18,100,'#8b6248',6,INK,5)+
+      rect(110,24,18,100,'#8b6248',6,INK,5)+rect(0,-84,140,84,'#a98868',9,INK,6),'translate(1640,580)')+
+    g(rect(0,0,260,170,'#8fb3c9',16,INK,7)+rect(24,24,212,92,'#5d7c92',9,INK,5),'translate(1310,620)');
+  const backdrop = sky('#c6cdd7','#e2e6ec')+
+      rect(0,180,W,HZ-180+10,'#cdd2da')+path(`M 0 180 H 1920`,'none',INK,6)+
+      rect(150,60,520,120,'#e9ecf1',14,INK,6)+txt(410,140,'そだいごみ おきば',56,'#5b6270')+
+      ground('#c1c5ce');
+  if(u<0.45){ const p=seg(u,0,0.45);
+    return backdrop + cam(junk+
+          shiro(t,{x:860,y:BASE,s:1.3,on:false,lie:true})+
+          hana(t,{x:lerp(1720,1200,smooth(p)),y:BASE,s:CS,emote:'neutral',walk:t*1.4,flip:true}),
+          {z:1+p*0.14,zx:1000,zy:700});
+  }
+  if(u<0.78){ const p=seg(u,0.45,0.78);
+    return backdrop + cam(junk+
+          shiro(t,{x:760,y:930,s:2.3,on:false,lie:true})+
+          // しゃがんで手をのばすハナ
+          g(hana(t,{x:0,y:0,s:1.75,emote:'sad',arm:'hold',flip:true}),'translate(1420,980)'),
+          {z:1.10+p*0.10,zx:1050,zy:760});
+  }
+  const p=seg(u,0.78,1);
+  return backdrop + cam(junk+
+        g(hana(t,{x:0,y:0,s:1.75,emote:'happy',arm:'hold'})+
+          shiro(t,{x:0,y:-300,s:1.15,on:false}),`translate(960,${900-p*20})`)+
+        `<g opacity="${p*0.7}">`+circ(620,260,10,C.yellow)+circ(1330,220,8,C.yellow)+circ(1180,400,7,C.yellow)+`</g>`,
+        {z:1.02+p*0.08,zy:700});
+};
+
+// ---- S3 シロが目をさます
+SCENES.s3 = (u,t)=>{
+  if(u<0.46){ const p=seg(u,0,0.46);
+    return room({wall:'#3c4570',back:'#2f3760',night:true})+
+      cam(`<defs><radialGradient id="lamp"><stop offset="0" stop-color="#ffe6a8" stop-opacity="0.8"/>
+            <stop offset="1" stop-color="#ffe6a8" stop-opacity="0"/></radialGradient></defs>`+
+          ell(900,720,640,440,'url(#lamp)')+
+          hana(t,{x:640,y:1000,s:1.6,emote:'neutral',arm:'hold'})+
+          shiro(t,{x:1140,y:DESK_Y,s:1.15,on:false,lie:true})+ desk()+
+          g(rect(0,0,30,150,'#6f7788',10,INK,5)+rect(-9,-50,48,56,'#ff7a6b',10,INK,5),
+            'translate(340,700) rotate(10)')+
+          path('M 1360 838 q 110 -78 240 -28','none','#ffcf5c',11),
+          {z:1.02+p*0.08,zx:920,zy:700});
+  }
+  if(u<0.74){ const p=seg(u,0.46,0.74);
+    const lit = p>0.42, gl=clamp((p-0.42)/0.25);
+    return sky('#ffd9a0','#fff3d8')+
+      cam(rect(0,0,W,H,'#fff0d0')+
+          shiro(t,{x:960,y:900,s:3.4,on:lit,glow:gl})+
+          `<g opacity="${gl}">`+circ(430,260,12,C.yellow)+circ(1470,230,10,C.yellow)+
+            circ(1620,520,11,C.yellow)+circ(330,560,9,C.yellow)+`</g>`,
+          {z:1.06-p*0.06,zy:560});
+  }
+  const p=seg(u,0.74,1);
+  const jump=Math.abs(Math.sin(p*Math.PI*3))*70;
+  return room({wall:'#ffeccd',back:'#fff6e6',win:'#bfe6f7',desk:false})+
+    cam(hana(t,{x:740,y:970-jump,s:1.7,emote:'happy',arm:'up'})+
+        shiro(t,{x:1240,y:970-jump*0.8,s:1.4,on:true})+
+        petals(t*0.4,10,'s3p'),
+        {z:1.0+p*0.06,zy:700});
+};
+
+// ---- S4 ここほれ、ワン！
+SCENES.s4 = (u,t)=>{
+  const base = sky('#9fd8f0','#e2f3fb')+cloud(380,170,1.0)+cloud(1520,130,0.85)+
+      danchi('b',{lit:0.2})+ground(C.concrete);
+  if(u<0.28){ const p=seg(u,0,0.28);
+    return base+ cam(crack(720,880,1.2,'q1')+
+          shiro(t,{x:880,y:BASE,s:1.55,on:true,dig:1})+ dust(t,860,860,10,'s4d')+
+          hana(t,{x:1420,y:BASE,s:CS,emote:'wow'}),
+          {z:1.02+p*0.12,zx:960,zy:720});
+  }
+  if(u<0.54){ const p=seg(u,0.28,0.54);
+    const rise=smooth(p)*110;
+    return base+ cam(rect(660,830,360,200,C.soil,24,INK,7)+ell(840,838,178,44,C.soil2)+
+          g(rect(-142,-110,284,220,'#9ec4b8',20,INK,8)+rect(-142,-110,284,38,'#7fae9f',11,INK,6)+
+            path('M -96 -28 h 192 M -96 24 h 144','none','#5f8b7e',9),
+            `translate(840,${880-rise}) rotate(${-8+Math.sin(t*2)*3})`)+
+          dust(t,840,880,6,'s4e')+
+          shiro(t,{x:1240,y:BASE,s:1.35,on:true})+
+          hana(t,{x:420,y:BASE,s:CS,emote:'wow'}),
+          {z:1.08+p*0.08,zx:900,zy:740});
+  }
+  if(u<0.80){ const p=seg(u,0.54,0.80);
+    return sky('#ffe9c9','#fff7ea')+
+      cam(rect(0,0,W,H,'#fff3dc')+
+          g(rect(-500,-330,1000,660,'#9ec4b8',34,INK,10)+
+            rect(-500,-330,1000,70,'#7fae9f',20,INK,8)+
+            g(rect(0,0,360,266,'#fff',12,INK,8)+rect(22,22,316,196,'#cfe0ee',6)+
+              circ(120,120,48,'#ffd9b8',INK,6)+circ(240,128,42,'#ffd9b8',INK,6)+
+              path('M 96 136 q 24 20 48 0 M 218 144 q 22 18 44 0','none',INK,5),
+              'translate(-450,-230) rotate(-7)')+
+            g(rect(0,0,350,252,'#fff8e6',12,INK,8)+
+              path('M 34 62 h 280 M 34 112 h 280 M 34 162 h 196','none','#b9a887',8),
+              'translate(-10,-190) rotate(5)')+
+            `<g opacity="${0.35+0.3*Math.sin(t*4)}">`+circ(330,110,96,C.yellow)+`</g>`+
+            g(ell(0,0,50,64,'#a5713f',INK,8)+path('M 0 -64 q 16 -26 0 -40','none',INK,7)+
+              ell(-15,-14,15,20,'#c99a5e'),`translate(330,${110+Math.sin(t*2)*10})`),
+            'translate(960,540)'),
+          {z:1.0+p*0.10});
+  }
+  const p=seg(u,0.80,1);
+  return base+ cam(rect(660,830,360,200,C.soil,24,INK,7)+
+        hana(t,{x:700,y:BASE,s:CS,emote:'happy'})+
+        shiro(t,{x:1010,y:BASE,s:1.2,on:true})+
+        baa(t,{x:1400,y:BASE,s:1.4})+
+        `<g opacity="${p*0.8}">`+circ(420,250,11,C.yellow)+circ(1650,220,10,C.yellow)+`</g>`,
+        {z:1.0+p*0.06,zy:720});
+};
+
+// ---- S5 ケンタがやってくる
+SCENES.s5 = (u,t)=>{
+  const base = sky('#9fd8f0','#e4f3fb')+cloud(460,160,1.0)+cloud(1470,200,0.8)+
+      danchi('b',{lit:0.2})+ground(C.concrete);
+  if(u<0.5){ const p=seg(u,0,0.5);
+    return base+ cam(hana(t,{x:620,y:BASE,s:CS,emote:'neutral'})+
+          shiro(t,{x:900,y:BASE,s:1.2,on:true})+
+          kenta(t,{x:lerp(2000,1380,smooth(p)),y:BASE,s:1.62,phone:true,flip:true})+
+          `<g opacity="${ease(p,0.45,0.95)*0.95}">`+
+            g(rect(-250,-104,500,208,'#fff',24,INK,8)+
+              txt(0,-22,'お宝 はっくつ！',60,'#ff7a6b')+txt(0,54,'ぜったい バズる',46,'#5b6270'),
+              'translate(1420,250)')+
+            path('M 1370 356 l -46 66','none',INK,7)+
+          `</g>`,
+          {z:1.0+p*0.05,zy:700});
+  }
+  const p=seg(u,0.5,1);
+  return base+ cam(hana(t,{x:660,y:BASE,s:1.55,emote:'sad'})+
+        shiro(t,{x:lerp(920,1180,smooth(p)),y:lerp(BASE,BASE-70,smooth(p)),s:1.2,on:true})+
+        kenta(t,{x:1420,y:BASE,s:1.62,phone:false,flip:true,emote:'happy'}),
+        {z:1.04+p*0.06,zx:1050,zy:720});
+};
+
+// ---- S6 シロがこわれる
+SCENES.s6 = (u,t)=>{
+  const base = sky('#8fb8cf','#cfdde6')+danchi('b',{lit:0.12})+ground('#aeb3bd','#8f959f');
+  if(u<0.42){ const p=seg(u,0,0.42);
+    const items=[['#c0c6d0',70,46],['#ffd9e0',62,62],['#a9d6c6',80,40],['#d9c39a',58,58],
+                 ['#c9b6e0',74,44],['#f2c48c',66,50],['#b7c9e0',76,42]];
+    let junk=''; const n=Math.floor(p*7);
+    for(let i=0;i<n;i++){const it=items[i];
+      junk+=g(rect(0,0,it[1],it[2],it[0],11,INK,6),`translate(${620+i*104},${820-(i%2)*46}) rotate(${i*17-30})`);}
+    return base+ cam(rect(620,830,460,180,C.soil,20,INK,7)+junk+
+          shiro(t,{x:880,y:BASE,s:1.45,on:true,dig:1})+dust(t,880,850,10,'s6d','#9aa0ab')+
+          kenta(t,{x:1440,y:BASE,s:1.62,phone:true,flip:true,emote:p>0.6?'angry':'neutral'})+
+          hana(t,{x:400,y:BASE,s:1.45,emote:'sad'}),
+          {z:1.02+p*0.10,zx:1000,zy:740});
+  }
+  if(u<0.62){ const p=seg(u,0.42,0.62);
+    // シルエット。衝撃そのものは見せない
+    return sky('#6d7f92','#a6b6c2')+
+      cam(rect(0,HZ,W,H-HZ,'#5f6f7d')+
+          `<g opacity="0.94">`+kenta(t,{x:1300,y:1020,s:1.95,emote:'angry',flip:true})+`</g>`+
+          g(shiro(t,{x:0,y:0,s:1.3,on:true,flip:true}),
+            `translate(${880-p*60},${520-Math.sin(p*Math.PI)*150}) rotate(${-25-p*150})`),
+          {z:1.02+p*0.08,zx:1000,zy:740});
+  }
+  if(u<0.70){ // まぶしい点滅は避け、静かに暗転させる
+    const p=seg(u,0.62,0.70);
+    const k=smooth(clamp(p*1.6));
+    return sky('#6d7f92','#a6b6c2')+rect(0,HZ,W,H-HZ,'#5f6f7d')+
+      `<g opacity="${k}">`+rect(0,0,W,H,'#1a1c2e')+`</g>`;
+  }
+  const p=seg(u,0.70,1);
+  return sky('#5f6f7d','#9aa8b4')+
+    cam(danchi('b',{lit:0.08})+ground('#59636f','#48515c')+
+        `<g opacity="${lerp(0.55,0,smooth(p*2))}">`+rect(0,0,W,H,'#1a1c2e')+`</g>`+
+        shiro(t,{x:860,y:920,s:1.9,on:false,lie:true})+
+        `<g opacity="${1-smooth(p*1.5)}">`+circ(980,800,32,C.eye)+`</g>`+
+        kenta(t,{x:1480,y:BASE,s:1.55,emote:'sorry',flip:true})+
+        hana(t,{x:340,y:BASE,s:1.5,emote:'wow'}),
+        {z:1.06-p*0.04,zx:900,zy:760});
+};
+
+// ---- S7 直らない
+SCENES.s7 = (u,t)=>{
+  const rm = room({wall:'#5a6485',back:'#4a5470',win:'#3a4462',rain:true,t:t});
+  if(u<0.58){ const p=seg(u,0,0.58);
+    return rm + cam(hana(t,{x:640,y:1030,s:1.85,emote:'sad',arm:'hold'})+
+          shiro(t,{x:1200,y:DESK_Y,s:1.5,on:false,lie:true})+ desk()+
+          g(rect(0,0,30,150,'#6f7788',10,INK,5)+rect(-9,-50,48,56,'#ff7a6b',10,INK,5),
+            'translate(360,700) rotate(10)'),
+          {z:1.02+p*0.10,zx:940,zy:720});
+  }
+  const p=seg(u,0.58,1);
+  return rm + cam(hana(t,{x:880,y:1130,s:2.1,emote:'cry',arm:'hold'})+
+        shiro(t,{x:900,y:770,s:1.5,on:false,lie:true}),
+        {z:1.02+p*0.06,zy:720});
+};
+
+// ---- S8 シロのひみつ
+SCENES.s8 = (u,t)=>{
+  if(u<0.34){ const p=seg(u,0,0.34);
+    return room({wall:'#6d7796',back:'#5c6684',win:'#8fb6d6'})+
+      cam(hana(t,{x:480,y:1000,s:1.5,emote:'wow'})+
+          shiro(t,{x:1140,y:DESK_Y,s:2.0,on:false,lie:true})+
+          // おなかのハッチが少しだけ開いて光がもれる
+          `<g opacity="${0.4+0.4*Math.sin(t*4)}">`+
+            path('M 1030 800 q 96 34 194 4','none',C.yellow,13)+`</g>`+
+          desk(),
+          {z:1.02+p*0.12,zx:1000,zy:720});
+  }
+  if(u<0.68){ const p=seg(u,0.34,0.68);
+    const r=R('seeds'); let seeds=''; const n=Math.floor(p*44);
+    for(let i=0;i<n;i++){
+      const fall=clamp((p*44-i)/9);
+      seeds+=ell(1120+(r()-0.5)*540, lerp(872,900+r()*66,smooth(fall)), 17,22,'#a5713f',INK,4);
+    }
+    return sky('#ffe9c9','#fff7ea')+
+      cam(rect(0,0,W,H,'#fff3dc')+ rect(0,930,W,H-930,'#e8dcc4')+
+          // シロを横倒しの大写しにして、おなかのハッチから土と種がこぼれる
+          shiro(t,{x:760,y:900,s:2.9,on:false,lie:true})+
+          // おなかのハッチが開いている
+          g(rect(-96,-16,192,32,C.soil2,14,INK,7)+path('M -96 -16 l -54 -46','none',INK,8),
+            'translate(760,872)')+
+          ell(1120,940,270,58,C.soil)+ seeds+
+          `<g opacity="${p*0.85}">`+circ(300,220,13,C.yellow)+circ(1560,240,12,C.yellow)+
+            circ(1700,520,11,C.yellow)+`</g>`,
+          {z:1.0+p*0.06,zy:720});
+  }
+  // 回想（セピア）：夜、シロがひとつずつ種をうめていた
+  const p=seg(u,0.68,1);
+  const px = lerp(300,1500,p);
+  let marks='';
+  for(let i=0;i<9;i++){const mx=240+i*170; if(mx<px) marks+=ell(mx,915,22,26,'#5f4d38',INK,4);}
+  return sky('#8a7457','#c0a87e')+
+    cam(danchi('b',{lit:0.06})+ground('#7a664c','#5f4d38')+
+        circ(1600,200,64,'#fff2c8')+
+        marks + shiro(t,{x:px,y:BASE+40,s:2.1,on:true,dig:1,glow:0.5})+
+        `<g opacity="0.30">`+rect(0,0,W,H,'#c9a86e')+`</g>`,
+        {z:1.0+p*0.06,zy:700});
+};
+
+// ---- S9 春がくる
+SCENES.s9 = (u,t)=>{
+  if(u<0.24){ const p=seg(u,0,0.24);
+    return sky('#c7d6e2','#eef3f7')+
+      cam(danchi('c',{lit:0.32,warm:true})+ground('#e2e8ee','#c2cad2')+
+          crack(700,880,1.4,'q1')+crack(1220,910,1.2,'q2')+crack(380,940,1.1,'q3')+
+          ell(300,930,220,44,'#fbfdff')+ell(1500,900,260,50,'#fbfdff')+ell(900,1010,340,54,'#fbfdff')+
+          g(rect(0,0,300,34,'#9b8f7d',10,INK,6)+rect(26,34,24,74,'#7d7365',8,INK,5)+
+            rect(250,34,24,74,'#7d7365',8,INK,5)+ell(150,-8,158,22,'#fbfdff'),'translate(1380,690)')+
+          snow(t,70,'sn'),
+          {z:1.0+p*0.05,zy:720});
+  }
+  if(u<0.46){ const p=seg(u,0.24,0.46);
+    let sp='';
+    for(let i=0;i<11;i++){const x=140+i*168, d=clamp(p*1.7-(i%5)*0.09);
+      sp+=sprout(x,830+((i%3)*66),2.6,d,t);}
+    return sky('#a9d8ee','#ecf7fd')+cloud(400,170,0.9)+
+      cam(danchi('c',{lit:0.34,warm:true})+ground(C.concrete)+
+          crack(700,880,1.4,'q1')+crack(1220,910,1.2,'q2')+sp,
+          {z:1.02+p*0.08,zy:800});
+  }
+  if(u<0.66){ const p=seg(u,0.46,0.66);
+    let fl='';
+    for(let i=0;i<13;i++){const x=110+i*146, d=clamp(p*1.6-(i%4)*0.1);
+      fl += d<0.7 ? sprout(x,840+((i%3)*60),2.6,1,t)
+                  : flower(x,760+((i%3)*66),1.0+d*0.9,[C.pink,C.yellow,C.red,C.purple][i%4],t,i);}
+    return sky('#9fd6ef','#f2fbff')+cloud(380,160,1.0)+cloud(1510,200,0.8)+
+      cam(danchi('c',{lit:0.36,warm:true})+ground(C.concrete)+fl,
+          {z:1.04+p*0.06,zy:800});
+  }
+  const p=seg(u,0.66,1);
+  const r=R('bloom'); let fl='';
+  for(let i=0;i<80;i++){const x=r()*W, y=HZ+70+r()*380;
+    fl+=flower(x,y,(0.55+r()*0.7)*(0.55+0.55*smooth(p)),[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
+  return sky('#8fd0ee','#f6fdff')+cloud(340,150,1.1)+cloud(1530,190,0.9)+
+    cam(danchi('c',{lit:0.5,warm:true,open:0.35})+ground('#8fc27f','#6ea55f')+fl+
+        crowd(t,'s9',9,180,1780,800,0.95)+
+        hana(t,{x:820,y:BASE,s:1.55,emote:'happy',arm:'up'})+
+        baa(t,{x:1180,y:BASE,s:1.35})+
+        petals(t,26,'s9p'),
+        {z:1.12-p*0.12,zy:700});
+};
+
+// ---- S10 いっしょに水をやる
+function flowerField(seedn=80){
+  const r=R('bloom'); let fl='';
+  for(let i=0;i<seedn;i++){const x=r()*W, y=HZ+70+r()*380;
+    fl+=flower(x,y,0.55+r()*0.7,[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],0,i);}
+  return fl;
+}
+SCENES.s10 = (u,t)=>{
+  const r=R('bloom'); let fl='';
+  for(let i=0;i<80;i++){const x=r()*W, y=HZ+70+r()*380;
+    fl+=flower(x,y,0.55+r()*0.7,[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
+  const base = sky('#8fd0ee','#f6fdff')+cloud(380,150,1.0)+cloud(1490,190,0.85)+
+      danchi('c',{lit:0.5,warm:true,open:0.3})+ground('#8fc27f','#6ea55f');
+  const can=(x,y,s,pour)=>g(
+      rect(-56,-44,112,88,'#7fd1c9',16,INK,6)+rect(-18,-64,36,22,'#7fd1c9',7,INK,5)+
+      path('M 56 -22 q 66 -12 86 34','none','#7fd1c9',13)+
+      (pour? path('M 136 20 q 12 66 -6 120','none','#8fd3ef',11)+ell(128,152,28,11,'#8fd3ef',INK,4):''),
+      `translate(${x},${y}) scale(${s})`);
+  if(u<0.42){ const p=seg(u,0,0.42);
+    return base+ cam(fl+ hana(t,{x:700,y:BASE,s:1.55,emote:'neutral'})+
+          kenta(t,{x:1480,y:BASE,s:1.6,emote:'sorry',flip:true})+ petals(t,18,'s10p'),
+          {z:1.02+p*0.08,zx:1100,zy:720});
+  }
+  if(u<0.70){ const p=seg(u,0.42,0.70);
+    return base+ cam(fl+ hana(t,{x:780,y:BASE,s:1.6,emote:'happy',arm:'hold'})+
+          can(lerp(940,1230,smooth(p)),lerp(700,730,smooth(p)),1.0,false)+
+          kenta(t,{x:1440,y:BASE,s:1.6,emote:'sorry',flip:true})+ petals(t,18,'s10q'),
+          {z:1.06+p*0.03,zx:1100,zy:720});
+  }
+  const p=seg(u,0.70,1);
+  return base+ cam(fl+ crowd(t,'s10c',7,200,1760,800,0.85)+
+        hana(t,{x:700,y:BASE,s:1.5,emote:'happy'})+
+        kenta(t,{x:1060,y:BASE,s:1.55,emote:'happy'})+ can(1200,720,0.95,true)+
+        baa(t,{x:1470,y:BASE,s:1.3})+ petals(t,22,'s10r'),
+        {z:1.04-p*0.10,zy:700});
+};
+
+// ---- end 結び＋タイトル
+SCENES.end = (u,t)=>{
+  const r=R('bloom'); let fl='';
+  for(let i=0;i<90;i++){const x=r()*W, y=HZ+60+r()*400;
+    fl+=flower(x,y,0.55+r()*0.75,[C.pink,C.yellow,C.red,C.purple,'#fff'][i%5],t,i);}
+  const base = sky('#8fd0ee','#fdf7ee')+cloud(360,145,1.1)+cloud(1510,185,0.9)+
+      danchi('c',{lit:0.5,warm:true,open:0.3})+ground('#8fc27f','#6ea55f');
+  if(u<0.55){ const p=seg(u,0,0.55);
+    return base+ cam(fl+
+          g(rect(-11,-118,22,140,'#a98868',7,INK,5)+
+            g(rect(-34,-18,68,36,C.collar,11,INK,5),'translate(0,-108)')+
+            `<g opacity="${0.32+0.24*Math.sin(t*2.2)}">`+circ(0,-108,58,C.yellow)+`</g>`,
+            'translate(960,830)')+
+          hana(t,{x:640,y:BASE,s:1.5,emote:'happy'})+
+          kenta(t,{x:1300,y:BASE,s:1.55,emote:'happy',flip:true})+
+          petals(t,24,'endp'),
+          {z:1.08-p*0.08,zy:720});
+  }
+  const p=seg(u,0.55,1);
+  const pop=smooth(clamp(p*2.6));
+  return base+ cam(fl+petals(t,28,'endq'),{z:1.0,zy:720})+
+    `<g opacity="${lerp(0,0.74,pop)}">`+rect(0,0,W,H,'#2b2545')+`</g>`+
+    g(txt(0,0,'ここほれ、シロ！',168,'#fff')+
+      txt(0,110,'〜 はなさかじいさん 2026 〜',58,'#ffe6a8')+
+      g(shiro(t,{x:0,y:0,s:1.25,on:true}),'translate(0,430)'),
+      `translate(960,400) scale(${lerp(0.62,1,pop)})`);
+};
+
+// ===================================================================== 進行
+let TL=null;
+function setTimeline(tl){ TL=tl; }
+function eventAt(tt){
+  if(!TL) return null;
+  let cur=null;
+  for(const e of TL.events){ if(tt>=e.start-0.001) cur=e; else break; }
+  return cur;
+}
+window.__seek = function(tt){
+  const art=document.getElementById('art'), sub=document.getElementById('sub');
+  let sceneId=TL.order[0], st=0, en=1;
+  for(const k of TL.order){
+    const s=TL.scenes[k]; if(!s) continue;
+    if(tt>=s.start-0.0001){ sceneId=k; st=s.start; en=s.end; }
+  }
+  const u=clamp((tt-st)/Math.max(0.001,en-st));
+  art.innerHTML = SCENES[sceneId](u,tt);
+
+  const e=eventAt(tt);
+  let text = (e && e.sub && tt<=e.end+0.45) ? e.sub : '';
+  if(sceneId==='end' && u>0.55) text='';
+  sub.textContent = text;
+  const col={N:'#ffffff',hana:'#ffe9a8',kenta:'#c8f5e6',baa:'#efe2ff',all:'#ffd9e6'};
+  sub.style.color = (e && col[e.speaker]) ? col[e.speaker] : '#ffffff';
+  document.getElementById('scrim').style.opacity = text ? 1 : 0.35;
+};
+</script>

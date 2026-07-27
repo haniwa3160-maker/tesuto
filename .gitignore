@@ -1,0 +1,6 @@
+build/frames/
+build/check/
+build/*.wav
+build/sa*.wav
+build/salist.txt
+__pycache__/
